@@ -98,8 +98,7 @@ class puppet-redbox (
     has_ssl                  => $has_ssl,
     server_url               => $server_url,
   }
-  
-  puppet-redbox:add_cron { $crontab: }
+
+  puppet-redbox::add_cron { $crontab: }
 
 }
-
