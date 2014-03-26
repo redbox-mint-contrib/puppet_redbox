@@ -1,4 +1,4 @@
-define redbox::deploy_archive (
+define puppet-redbox::deploy_archive (
   $archive           = $title,
   $url               = 'http://dev.redboxresearchdata.com.au/nexus/service/local/artifact/maven/redirect',
   $archive_extension = 'tar.gz',

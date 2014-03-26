@@ -1,4 +1,4 @@
-define redbox::add_yum_repo (
+define puppet-redbox::add_yum_repo (
   $repo = $title,) {
   yumrepo { $repo[name]:
     descr    => $repo[descr],

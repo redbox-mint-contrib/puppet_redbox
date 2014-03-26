@@ -1,4 +1,4 @@
-define redbox::update_server_url (
+define puppet-redbox::update_server_url (
   $system     = $title,
   $has_ssl    = false,
   $server_url = $::fqdn,

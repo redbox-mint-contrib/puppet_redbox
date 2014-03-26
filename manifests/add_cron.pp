@@ -1,4 +1,4 @@
-define redbox::add_cron (
+define puppet-redbox::add_cron (
   $crontab = $title,) {
   cron { $crontab[name]:
     command => $crontab[command],

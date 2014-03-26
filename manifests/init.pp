@@ -1,6 +1,6 @@
-# == Class: redbox
+# == Class: puppet-redbox
 #
-# Full description of class redbox here.
+# Full description of class puppet-redbox here.
 #
 # === Parameters
 #
@@ -23,7 +23,7 @@
 #
 # === Examples
 #
-#  class { redbox:
+#  class { puppet-redbox:
 #    servers => [ 'pool.ntp.org', 'ntp.local.company.com' ],
 #  }
 #
@@ -35,8 +35,8 @@
 #
 # Copyright 2013 Your name here, unless otherwise noted.
 #
-class redbox (
-  $redbox_user              = hiera(redbox_user),
+class puppet-redbox (
+  $redbox_user              = hiera(puppet-redbox_user),
   $directories              = hiera_array(directories),
   $install_parent_directory = hiera(install_parent_directory),
   $packages                 = hiera_array(packages),
@@ -63,19 +63,19 @@ class redbox (
     logoutput => false,
   }
 
-  redbox::add_systemuser { $redbox_user: } ->
+  puppet-redbox::add_systemuser { $redbox_user: } ->
   add_directory { $directories:
     owner            => $redbox_user,
     parent_directory => $install_parent_directory,
   } ->
-  class { 'redbox::java': }
+  class { 'puppet-redbox::java': }
 
   if ($proxy) {
-    class { 'redbox::proxy_server':
-      require    => Class['Redbox::Java'],
+    class { 'puppet-redbox::proxy_server':
+      require    => Class['Puppet-redbox::Java'],
       before     => [
-        Redbox::Add_redbox_package[$packages],
-        Class['redbox::deploy_script']],
+        Puppet-redbox::Add_redbox_package[$packages],
+        Class['Puppet-redbox::deploy_script']],
       server_url => $server_url,
       has_ssl    => $has_ssl,
       ssl_files  => $ssl_files,
@@ -83,7 +83,7 @@ class redbox (
     } ~> Service['httpd']
   }
 
-  class { 'redbox::deploy_script':
+  class { 'puppet-redbox::deploy_script':
     archives                 => $archives,
     has_ssl                  => $has_ssl,
     server_url               => $server_url,
@@ -91,14 +91,15 @@ class redbox (
     owner                    => $redbox_user,
   }
 
-  redbox::add_yum_repo { $yum_repos: } ->
-  redbox::add_redbox_package { $packages:
+  puppet-redbox::add_yum_repo { $yum_repos: } ->
+  puppet-redbox::add_redbox_package { $packages:
     owner                    => $redbox_user,
     install_parent_directory => $install_parent_directory,
     has_ssl                  => $has_ssl,
     server_url               => $server_url,
   }
   
-  redbox:add_cron { $crontab: }
+  puppet-redbox:add_cron { $crontab: }
+
 }
 

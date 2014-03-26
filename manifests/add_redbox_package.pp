@@ -1,4 +1,4 @@
-define redbox::add_redbox_package (
+define puppet-redbox::add_redbox_package (
   $packages         = $title,
   $owner            = undef,
   $install_parent_directory,
@@ -10,7 +10,7 @@ define redbox::add_redbox_package (
   $target_path    = "${install_parent_directory}/${redbox_system}/${server_directory}"
 
   package { $redbox_package: } ->
-  redbox::update_server_url { $redbox_system:
+  puppet-redbox::update_server_url { $redbox_system:
     has_ssl                  => $has_ssl,
     server_url               => $server_url,
     install_parent_directory => $install_parent_directory,

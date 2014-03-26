@@ -1,10 +1,10 @@
-#redbox using puppet : serverless
+#puppet-redbox using puppet : serverless
 #__________________________
 
 This module deploys, installs and runs redbox.
 
 ## pre-install
-1. run scripts/pre-install.sh to setup puppet for redbox use.
+1. run scripts/pre-install.sh to setup puppet for puppet-redbox use.
 2. requires hiera configuration
 
 ## install

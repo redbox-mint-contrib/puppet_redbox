@@ -1,4 +1,4 @@
-class redbox::variables::java {
+class puppet-redbox::variables::java {
   $distribution = 'jdk'
   $package = undef
   $java_alternative = undef

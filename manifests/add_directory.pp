@@ -1,4 +1,4 @@
-define redbox::add_directory (
+define puppet-redbox::add_directory (
   $end_path         = $title,
   $owner,
   $parent_directory = undef,) {
@@ -6,6 +6,6 @@ define redbox::add_directory (
     ensure  => directory,
     recurse => true,
     owner   => $owner,
-    require => Redbox::Add_systemuser[$owner],
+    require => Puppet-redbox::Add_systemuser[$owner],
   }
 }

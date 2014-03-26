@@ -1,4 +1,4 @@
-class redbox::deploy_script (
+class puppet-redbox::deploy_script (
   $script_name              = 'deploy.sh',
   $archive_extension        = 'tar.gz',
   $new_extension            = "timestamp.new",
@@ -24,7 +24,7 @@ class redbox::deploy_script (
     order   => '01',
   }
 
-  redbox::deploy_archive { $archives: deploy_script_path => $deploy_script_path, } ->
+  puppet-redbox::deploy_archive { $archives: deploy_script_path => $deploy_script_path, } ->
   exec { "$deploy_script_path":
     cwd       => $working_directory,
     user      => $owner,

@@ -1,10 +1,10 @@
-class redbox::proxy_server (
+class puppet-redbox::proxy_server (
   $priority   = '10',
   $server_url = $::fqdn,
   $docroot    = '/var/www/html',
   $proxy      = undef,
   $ssl_files  = undef,
-  $has_ssl    = false,) {
+  $has_ssl    = undef,) {
   case $operatingsystem {
     'centos', 'redhat', 'fedora' : {
       $conf_dir    = '/etc/httpd/conf.d'
@@ -37,7 +37,7 @@ class redbox::proxy_server (
   file { 'redbox.conf':
     path    => "${conf_dir}/${priority}-redbox.conf",
     ensure  => file,
-    content => template("redbox/redbox.conf.erb"),
+    content => template("puppet-redbox/redbox.conf.erb"),
     require => Class['apache'],
   }
 

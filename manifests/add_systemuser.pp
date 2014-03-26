@@ -1,4 +1,4 @@
-define redbox::add_systemuser (
+define puppet-redbox::add_systemuser (
   $username = $title,
   $shell    = '/bin/bash') {
   user { $username:
