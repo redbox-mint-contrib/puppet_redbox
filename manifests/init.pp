@@ -36,7 +36,7 @@
 # Copyright 2013 Your name here, unless otherwise noted.
 #
 class puppet-redbox (
-  $redbox_user              = hiera(puppet-redbox_user),
+  $redbox_user              = hiera(redbox_user),
   $directories              = hiera_array(directories),
   $install_parent_directory = hiera(install_parent_directory),
   $packages                 = hiera_array(packages),
