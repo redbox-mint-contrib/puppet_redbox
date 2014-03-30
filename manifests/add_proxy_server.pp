@@ -1,4 +1,4 @@
-class puppet-redbox::proxy_server (
+class puppet-redbox::add_proxy_server (
   $priority   = '10',
   $server_url = $::fqdn,
   $docroot    = '/var/www/html',

@@ -71,7 +71,7 @@ class puppet-redbox (
   class { 'puppet-redbox::java': }
 
   if ($proxy) {
-    class { 'puppet-redbox::proxy_server':
+    class { 'puppet-redbox::add_proxy_server':
       require    => Class['Puppet-redbox::Java'],
       before     => [
         Puppet-redbox::Add_redbox_package[$packages],
@@ -89,16 +89,13 @@ class puppet-redbox (
     server_url               => $server_url,
     install_parent_directory => $install_parent_directory,
     owner                    => $redbox_user,
-  }
-
+  } ->
   puppet-redbox::add_yum_repo { $yum_repos: } ->
   puppet-redbox::add_redbox_package { $packages:
     owner                    => $redbox_user,
     install_parent_directory => $install_parent_directory,
     has_ssl                  => $has_ssl,
     server_url               => $server_url,
-  }
-
+  } ->
   puppet-redbox::add_cron { $crontab: }
-
 }

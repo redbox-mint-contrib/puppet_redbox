@@ -1,11 +1,10 @@
 class puppet-redbox::deploy_script (
   $script_name              = 'deploy.sh',
-  $archive_extension        = 'tar.gz',
   $new_extension            = "timestamp.new",
   $old_extension            = "timestamp.old",
-  $deploy_parent_directory  = "/opt/deploy",
-  $install_parent_directory = "/opt",
-  $owner                    = "redbox",
+  $deploy_parent_directory  = undef,
+  $install_parent_directory = undef,
+  $owner                    = undef,
   $archives,
   $server_url               = $::fqdn,
   $has_ssl                  = false,) {
@@ -20,7 +19,7 @@ class puppet-redbox::deploy_script (
 
   concat::fragment { "deploy_main":
     target  => $deploy_script_path,
-    content => template("redbox/deploy_main.sh.erb"),
+    content => template("puppet-redbox/deploy_main.sh.erb"),
     order   => '01',
   }
 

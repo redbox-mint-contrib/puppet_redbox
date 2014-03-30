@@ -14,7 +14,7 @@ define puppet-redbox::deploy_archive (
 
   concat::fragment { "deploy_${redbox_system}_fragment":
     target  => $deploy_script_path,
-    content => template("redbox/deploy_system_fragment.sh.erb"),
+    content => template("puppet-redbox/deploy_system_fragment.sh.erb"),
     order   => '10',
   }
 }

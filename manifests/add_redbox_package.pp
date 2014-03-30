@@ -15,20 +15,24 @@ define puppet-redbox::add_redbox_package (
     server_url               => $server_url,
     install_parent_directory => $install_parent_directory,
   } ->
-  exec { "restart_if_not_running":
-    command   => "service ${redbox_system} restart",
-    tries     => 2,
-    timeout   => 20,
-    try_sleep => 3,
-    user      => $owner,
-    cwd       => $target_path,
-    creates   => "${target_path}/tf.pid",
-    logoutput => true,
+  service { 'redbox':
+    enable     => true,
+    ensure     => running,
+    hasstatus  => true,
+    hasrestart => true,
+    status     => 'service redbox status | grep "is running"',
+    subscribe  => Package[$redbox_package],
   }
 
-  # problem possibly with chkconfig not picked up by puppet - so use exec
-  # service { 'redbox':
-  #  enable => true,
-  #  ensure => running,
-  #}
+  exec { "restart_on_refresh":
+    command     => "service ${redbox_system} restart",
+    tries       => 2,
+    try_sleep   => 3,
+    refreshonly => true,
+    subscribe   => Puppet-redbox::Update_server_url[$redbox_system],
+    user        => 'root',
+    cwd         => $target_path,
+    logoutput   => true,
+  }
+
 }
