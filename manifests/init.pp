@@ -93,7 +93,7 @@ class puppet-redbox (
     has_ssl                  => $has_ssl,
     server_url               => $server_url,
     install_parent_directory => $install_parent_directory,
-    deploy_parent           ,
+    deploy_parent            => $deploy_parent_directory,
     owner                    => $redbox_user,
   } ->
   puppet-redbox::add_yum_repo { $yum_repos: } ->
@@ -104,3 +104,4 @@ class puppet-redbox (
     server_url               => $server_url,
   } ->
   puppet-redbox::add_cron { $crontab: }
+}
