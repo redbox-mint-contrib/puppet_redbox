@@ -39,6 +39,7 @@ class puppet-redbox (
   $redbox_user              = hiera(redbox_user),
   $directories              = hiera_array(directories),
   $install_parent_directory = hiera(install_parent_directory),
+  $deploy_parent_directory  = '/opt/deploy/',
   $packages                 = hiera_array(packages),
   $archives                 = hiera_array(archives),
   $proxy                    = hiera_array(proxy),
@@ -56,7 +57,11 @@ class puppet-redbox (
     $server_url = $::ipaddress_lo
   }
 
-  host { [$::fqdn]: ip => $::ipaddress, }
+  host { [
+    $::fqdn,
+    $::hostname]:
+    ip => $::ipaddress,
+  }
 
   Exec {
     path      => $exec_path,
@@ -88,6 +93,7 @@ class puppet-redbox (
     has_ssl                  => $has_ssl,
     server_url               => $server_url,
     install_parent_directory => $install_parent_directory,
+    deploy_parent           ,
     owner                    => $redbox_user,
   } ->
   puppet-redbox::add_yum_repo { $yum_repos: } ->
@@ -98,4 +104,3 @@ class puppet-redbox (
     server_url               => $server_url,
   } ->
   puppet-redbox::add_cron { $crontab: }
-}
