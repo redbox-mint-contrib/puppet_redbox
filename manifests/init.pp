@@ -39,7 +39,7 @@ class puppet-redbox (
   $redbox_user              = hiera(redbox_user),
   $directories              = hiera_array(directories),
   $install_parent_directory = hiera(install_parent_directory),
-  $deploy_parent_directory  = '/opt/deploy/',
+  $deploy_parent_directory  = hiera(deploy_parent_directory),
   $packages                 = hiera_array(packages),
   $archives                 = hiera_array(archives),
   $proxy                    = hiera_array(proxy),
