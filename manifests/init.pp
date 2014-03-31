@@ -102,6 +102,6 @@ class puppet-redbox (
     install_parent_directory => $install_parent_directory,
     has_ssl                  => $has_ssl,
     server_url               => $server_url,
-  } ->
+  } ~> Service['httpd'] ->
   puppet-redbox::add_cron { $crontab: }
 }
