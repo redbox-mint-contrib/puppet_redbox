@@ -41,15 +41,27 @@ class puppet-redbox (
     'redbox',
     'mint',
     'deploy',
-    'deploy/mint']),
+    'deploy/mint']),  
   $install_parent_directory = hiera(install_parent_directory, '/opt'),
   $deploy_parent_directory  = hiera(deploy_parent_directory, '/opt/deploy'),
-  $packages                 = hiera_array(packages, undef),
-  $archives                 = hiera_array(archives, undef),
-  $proxy                    = hiera_array(proxy, undef),
-  $has_dns                  = hiera(has_dns, true),
-  $has_ssl                  = hiera(has_ssl, true),
-  $ssl_config               = hiera(ssl_config, undef),
+  $packages                 = hiera_array(packages, [{
+    system  => 'redbox', 
+    package => 'redbox-rdsi-arms-qcif'
+  }]),
+  $archives                 = hiera_array(archives, [{
+     name        => 'mint',
+     group       => 'com.googlecode.redbox-mint',
+     artifact    => 'mint-local-curation-demo',
+     web_context => 'mint',
+     version     => '1.6.2',
+     classifier  => 'build',
+     repo        => 'releases'}]),
+  $proxy                    = hiera_array(proxy, [{
+     path => '/',
+     url  => 'http://localhost:9000/',}]),
+  $has_dns                  = hiera(has_dns, false),
+  $has_ssl                  = hiera(has_ssl, false),
+  $ssl_config               = hiera_hash(ssl_config, undef),
   $exec_path                = hiera(exec_path, [
     '/usr/local/bin',
     '/opt/local/bin',
@@ -57,8 +69,15 @@ class puppet-redbox (
     '/usr/sbin',
     '/bin',
     '/sbin']),
-  $yum_repos                = hiera_array(yum_repos, undef),
+  $yum_repos                = hiera_array(yum_repos, [{
+    name     => 'redbox',
+    descr    => 'Redbox_repo',
+    baseurl  => 'http://dev.redboxresearchdata.com.au/yum/snapshots',
+    gpgcheck => 0,
+    enabled  => 1}]),
   $crontab                  = hiera_array(crontab, undef),) {
+  
+  
   if ($has_dns and $::fqdn) {
     $server_url = $::fqdn
   } elsif ($::ipaddress) {
@@ -99,7 +118,7 @@ class puppet-redbox (
   }
 
   class { 'puppet-redbox::deploy_script':
-    archives                 => $archives,
+    archives                   => $archives,
     has_ssl                  => $has_ssl,
     server_url               => $server_url,
     install_parent_directory => $install_parent_directory,
@@ -112,6 +131,10 @@ class puppet-redbox (
     install_parent_directory => $install_parent_directory,
     has_ssl                  => $has_ssl,
     server_url               => $server_url,
-  } ~> Service['httpd'] ->
-  puppet-redbox::add_cron { $crontab: }
+  } ~> Service['httpd']
+  
+  if ($crontab) {
+    puppet-redbox::add_cron { $crontab: }
+  }
+ 
 }

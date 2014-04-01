@@ -21,6 +21,21 @@ This module deploys, installs and runs redbox.
 * TODO : use gpg pattern for handling SSL certs and keys
 * TODO : improve way redbox rpm build, yum and puppet integrate
 
+## ssl-config: We use hiera-gpg and a private repo to hold this data.
+Our hiera config uses hashes, which in yaml looks like:
+ssl_config:
+  cert:
+  	file:
+    content: |
+    
+  key:
+  	file:
+    content: |
+    
+  chain:
+  	file:
+    content: |
+
 License
 -------
 See file, LICENCE
@@ -33,3 +48,5 @@ Support
 -------
 
 Please log tickets and issues at our [Projects site](http://projects.example.com)
+
+
