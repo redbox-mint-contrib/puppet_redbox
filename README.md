@@ -3,9 +3,7 @@
 
 This module deploys, installs and runs redbox.
 ## pre-requisites
-* Tested only on CentOS
-
-## pre-install
+* Tested only on CentOS*
 1. Clone/copy puppet-hiera-redbox:
 `sudo yum -y install git && git clone git@bitbucket.org:qcifltd/puppet-redbox.git /tmp/puppet-redbox`
 * you will need bitbucket access *
@@ -16,7 +14,6 @@ This module deploys, installs and runs redbox.
 `puppet apply -e "class {'puppet-redbox':}"`
 
 ## atm, manual configuration needed for:
-1. ssl certificates and keys, including their directories
 2. aaf rapid setup in home/system-config.json
 3. export apiKey in home/system-config.json
 
