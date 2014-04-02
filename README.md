@@ -5,15 +5,17 @@ This module deploys, installs and runs redbox.
 ## pre-requisites
 *Tested only on CentOS*
 
-1. Clone/copy puppet-hiera-redbox:
-`sudo yum -y install git && git clone git@bitbucket.org:qcifltd/puppet-redbox.git /tmp/puppet-redbox`
-* you will need bitbucket access *
-
+1. Clone/copy puppet-hiera-redbox (* you will need bitbucket access *):
+```
+sudo yum -y install git && git clone git@bitbucket.org:qcifltd/puppet-redbox.git /tmp/puppet-redbox
+```
 2. run scripts/pre-install.sh to setup puppet for puppet-redbox use (run as root) 
 3.  follow puppet-hiera-redbox's README.md if installing bitbucket module puppet-hiera-redbox
 
 ## install
-`puppet apply -e "class {'puppet-redbox':}"`
+```
+puppet apply -e "class {'puppet-redbox':}"
+```
 
 ## atm, manual configuration needed for:
 2. aaf rapid setup in home/system-config.json
@@ -26,6 +28,7 @@ This module deploys, installs and runs redbox.
 
 ## ssl-config: We use hiera-gpg and a private repo to hold this data.
 Our hiera config uses hashes, which in yaml looks like:
+```
 ssl_config:
   cert:
   	file:
@@ -38,7 +41,7 @@ ssl_config:
   chain:
   	file:
     content: |
-
+```
 License
 -------
 See file, LICENCE
