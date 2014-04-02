@@ -5,12 +5,12 @@ This module deploys, installs and runs redbox.
 *Tested only on CentOS*
 *No support to run without apache proxy server.*
 
-1. Clone/copy puppet-hiera-redbox (* you will need bitbucket access *):
+1.Clone/copy puppet-hiera-redbox (* you will need bitbucket access *):
 ```
 sudo yum -y install git && git clone git@bitbucket.org:qcifltd/puppet-redbox.git /tmp/puppet-redbox
 ```
-2.  run scripts/pre-install.sh to setup puppet for puppet-redbox use (run as root) 
-3.   follow puppet-hiera-redbox's README.md if installing bitbucket module puppet-hiera-redbox
+2.run scripts/pre-install.sh to setup puppet for puppet-redbox use (run as root) 
+3.follow puppet-hiera-redbox's README.md if installing bitbucket module puppet-hiera-redbox
 
 ## Install
 ```
