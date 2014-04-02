@@ -19,3 +19,4 @@ find /tmp -maxdepth 1 -iname "puppet-redbox" || exit 1
 echo "copying redbox to module path"
 rm -Rf /usr/share/puppet/modules/puppet-redbox
 cp -Rf /tmp/puppet-redbox /usr/share/puppet/modules/
+rm -Rf /tmp/puppet-redbox
