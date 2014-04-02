@@ -1,30 +1,30 @@
 #puppet-redbox using puppet : serverless
-#__________________________
-
 This module deploys, installs and runs redbox.
-## pre-requisites
+
+## Pre-requisites
 *Tested only on CentOS*
+*No support to run without apache proxy server.*
 
 1. Clone/copy puppet-hiera-redbox (* you will need bitbucket access *):
 ```
 sudo yum -y install git && git clone git@bitbucket.org:qcifltd/puppet-redbox.git /tmp/puppet-redbox
 ```
-2. run scripts/pre-install.sh to setup puppet for puppet-redbox use (run as root) 
-3.  follow puppet-hiera-redbox's README.md if installing bitbucket module puppet-hiera-redbox
+2.  run scripts/pre-install.sh to setup puppet for puppet-redbox use (run as root) 
+3.   follow puppet-hiera-redbox's README.md if installing bitbucket module puppet-hiera-redbox
 
-## install
+## Install
 ```
 puppet apply -e "class {'puppet-redbox':}"
 ```
 
-## atm, manual configuration needed for:
-2. aaf rapid setup in home/system-config.json
-3. export apiKey in home/system-config.json
+## Manual configuration needed for:
+* aaf rapid setup in home/system-config.json
+* export apiKey in home/system-config.json
 
-* No support to run without apache proxy server.
-* TODD : set up using r10k
-* TODO : improve way redbox rpm build, yum and puppet integrate
-* TODO : tidy up use of redbox-system to name relevant files the redbox package name, not just 'redbox'.
+##TODO:
+* set up using r10k/heat
+* improve way redbox rpm build, yum and puppet integrate
+* tidy up use of redbox-system to name relevant files the redbox package name, not just 'redbox'.
 
 ## ssl-config: We use hiera-gpg and a private repo to hold this data.
 Our hiera config uses hashes, which in yaml looks like:
