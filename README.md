@@ -17,8 +17,6 @@ This module deploys, installs and runs redbox.
 
 ## No support to run without apache proxy server.
 * Tested only on CentOS
-* TODD : set up using r10k
-* TODO : use gpg pattern for handling SSL certs and keys
 * TODO : improve way redbox rpm build, yum and puppet integrate
 
 License

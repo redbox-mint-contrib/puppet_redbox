@@ -36,19 +36,47 @@
 # Copyright 2013 Your name here, unless otherwise noted.
 #
 class puppet-redbox (
-  $redbox_user              = hiera(redbox_user),
-  $directories              = hiera_array(directories),
-  $install_parent_directory = hiera(install_parent_directory),
-  $deploy_parent_directory  = hiera(deploy_parent_directory),
-  $packages                 = hiera_array(packages),
-  $archives                 = hiera_array(archives),
-  $proxy                    = hiera_array(proxy),
-  $has_dns                  = hiera(has_dns),
-  $has_ssl                  = hiera(has_ssl),
-  $ssl_files                = hiera(ssl_files),
-  $exec_path                = hiera(exec_path),
-  $yum_repos                = hiera_array(yum_repos),
-  $crontab                  = hiera_array(crontab),) {
+  $redbox_user              = hiera(redbox_user, 'redbox'),
+  $directories              = hiera_array(directories, [
+    'redbox',
+    'mint',
+    'deploy',
+    'deploy/mint']),
+  $install_parent_directory = hiera(install_parent_directory, '/opt'),
+  $deploy_parent_directory  = hiera(deploy_parent_directory, '/opt/deploy'),
+  $packages                 = hiera_array(packages, [{
+      system  => 'redbox',
+      package => 'redbox-rdsi-arms-qcif'
+    }
+    ]),
+  $archives                 = hiera_array(archives, [{
+      name        => 'mint',
+      group       => 'com.googlecode.redbox-mint',
+      artifact    => 'mint-local-curation-demo',
+      web_context => 'mint',
+      version     => '1.6.2',
+      classifier  => 'build',
+      repo        => 'releases'
+    }
+    ]),
+  $proxy                    = hiera_array(proxy, [{
+      path => '/',
+      url  => 'http://localhost:9000/',
+    }
+    ]),
+  $has_dns                  = hiera(has_dns, false),
+  $has_ssl                  = hiera(has_ssl, false),
+  $ssl_config               = hiera_hash(ssl_config, undef),
+  $exec_path                = hiera(exec_path, ['/usr/local/bin', '/opt/local/bin', '/usr/bin', '/usr/sbin', '/bin', '/sbin']),
+  $yum_repos                = hiera_array(yum_repos, [{
+      name     => 'redbox',
+      descr    => 'Redbox_repo',
+      baseurl  => 'http://dev.redboxresearchdata.com.au/yum/snapshots',
+      gpgcheck => 0,
+      enabled  => 1
+    }
+    ]),
+  $crontab                  = hiera_array(crontab, undef),) {
   if ($has_dns and $::fqdn) {
     $server_url = $::fqdn
   } elsif ($::ipaddress) {
@@ -57,11 +85,7 @@ class puppet-redbox (
     $server_url = $::ipaddress_lo
   }
 
-  host { [
-    $::fqdn,
-    $::hostname]:
-    ip => $::ipaddress,
-  }
+  host { [$::fqdn, $::hostname]: ip => $::ipaddress, }
 
   Exec {
     path      => $exec_path,
@@ -78,12 +102,10 @@ class puppet-redbox (
   if ($proxy) {
     class { 'puppet-redbox::add_proxy_server':
       require    => Class['Puppet-redbox::Java'],
-      before     => [
-        Puppet-redbox::Add_redbox_package[$packages],
-        Class['Puppet-redbox::deploy_script']],
+      before     => [Puppet-redbox::Add_redbox_package[$packages], Class['Puppet-redbox::deploy_script']],
       server_url => $server_url,
       has_ssl    => $has_ssl,
-      ssl_files  => $ssl_files,
+      ssl_config => $ssl_config,
       proxy      => $proxy,
     } ~> Service['httpd']
   }
@@ -102,6 +124,9 @@ class puppet-redbox (
     install_parent_directory => $install_parent_directory,
     has_ssl                  => $has_ssl,
     server_url               => $server_url,
-  } ~> Service['httpd'] ->
-  puppet-redbox::add_cron { $crontab: }
+  } ~> Service['httpd']
+
+  if ($crontab) {
+    puppet-redbox::add_cron { $crontab: }
+  }
 }
