@@ -20,7 +20,7 @@ sudo /tmp/puppet-redbox/scripts/pre-install.sh
 
 ## Install
 ```
-puppet apply -e "class {'puppet-redbox':}"
+sudo puppet apply -e "class {'puppet-redbox':}"
 ```
 
 ## Manual configuration needed for:
