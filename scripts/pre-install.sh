@@ -16,7 +16,9 @@ puppet module install puppetlabs/apache
 echo "checking puppet-redbox cloned/copied to /tmp"
 find /tmp -maxdepth 1 -iname "puppet-redbox" || exit 1
 
-echo "copying redbox to module path"
+echo "removing existing puppet module"
 rm -Rf /usr/share/puppet/modules/puppet-redbox
+echo "copying redbox to module path"
 cp -Rf /tmp/puppet-redbox /usr/share/puppet/modules/
+echo "cleaning up tmp"
 rm -Rf /tmp/puppet-redbox
