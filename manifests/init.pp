@@ -68,6 +68,21 @@ class puppet-redbox (
   $has_ssl                  = hiera(has_ssl, false),
   $ssl_config               = hiera_hash(ssl_config, undef),
   $exec_path                = hiera(exec_path, ['/usr/local/bin', '/opt/local/bin', '/usr/bin', '/usr/sbin', '/bin', '/sbin']),
+  $ssl_config               = hiera_hash(ssl_config, {
+    cert  => {
+      file  => "/etc/ssl/local_certs/SSLCertificateFile/%{::fqdn}.crt"
+    }
+    ,
+    key   => {
+      file  => "/etc/ssl/local_certs/SSLCertificateKeyFile/%{::fqdn}.key"
+    }
+    ,
+    chain => {
+      file  => "/etc/ssl/local_certs/SSLCertificateChainFile/%{::fqdn}_CA.crt"
+    }
+  }
+  ),
+  $exec_path                = hiera(exec_path, ['/usr/local/bin', '/opt/local/bin', '/usr/bin', '/usr/sbin', '/bin', '/sbin']),
   $yum_repos                = hiera_array(yum_repos, [{
       name     => 'redbox',
       descr    => 'Redbox_repo',
