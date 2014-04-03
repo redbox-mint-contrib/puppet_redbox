@@ -66,8 +66,13 @@ class puppet-redbox (
     ]),
   $has_dns                  = hiera(has_dns, false),
   $has_ssl                  = hiera(has_ssl, false),
-  $ssl_config               = hiera_hash(ssl_config, undef),
-  $exec_path                = hiera(exec_path, ['/usr/local/bin', '/opt/local/bin', '/usr/bin', '/usr/sbin', '/bin', '/sbin']),
+  $exec_path                = hiera(exec_path, [
+    '/usr/local/bin',
+    '/opt/local/bin',
+    '/usr/bin',
+    '/usr/sbin',
+    '/bin',
+    '/sbin']),
   $ssl_config               = hiera_hash(ssl_config, {
     cert  => {
       file  => "/etc/ssl/local_certs/SSLCertificateFile/%{::fqdn}.crt"
@@ -82,7 +87,6 @@ class puppet-redbox (
     }
   }
   ),
-  $exec_path                = hiera(exec_path, ['/usr/local/bin', '/opt/local/bin', '/usr/bin', '/usr/sbin', '/bin', '/sbin']),
   $yum_repos                = hiera_array(yum_repos, [{
       name     => 'redbox',
       descr    => 'Redbox_repo',
@@ -91,7 +95,8 @@ class puppet-redbox (
       enabled  => 1
     }
     ]),
-  $crontab                  = hiera_array(crontab, undef),) {
+  $crontab                  = hiera_array(crontab, undef),
+  $tf_env                   = hiera_hash(tf_env, undef),) {
   if ($has_dns and $::fqdn) {
     $server_url = $::fqdn
   } elsif ($::ipaddress) {
@@ -139,6 +144,7 @@ class puppet-redbox (
     install_parent_directory => $install_parent_directory,
     has_ssl                  => $has_ssl,
     server_url               => $server_url,
+    tf_env                   => $tf_env,
   } ~> Service['httpd']
 
   if ($crontab) {

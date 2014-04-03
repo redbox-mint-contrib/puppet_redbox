@@ -1,19 +1,19 @@
 define puppet-redbox::add_redbox_package (
-  $packages         = $title,
-  $owner            = undef,
-  $install_parent_directory,
-  $server_directory = 'server',
-  $has_ssl          = undef,
-  $server_url       = undef,) {
+  $packages                 = $title,
+  $owner                    = undef,
+  $install_parent_directory = undef,
+  $has_ssl                  = undef,
+  $server_url               = undef,
+  $tf_env                   = undef,) {
   $redbox_package = $packages[package]
-  $redbox_system  = $packages[system]
-  $target_path    = "${install_parent_directory}/${redbox_system}/${server_directory}"
+  $redbox_system = $packages[system]
 
   package { $redbox_package: } ->
-  puppet-redbox::update_server_url { $redbox_system:
-    has_ssl                  => $has_ssl,
-    server_url               => $server_url,
-    install_parent_directory => $install_parent_directory,
+  puppet-redbox::update_server_env { "${install_parent_directory}/${redbox_system}/server/tf_env.sh":
+    tf_env     => $tf_env,
+    has_ssl    => $has_ssl,
+    server_url => $server_url,
+    notify     => Exec['restart_on_refresh'],
   } ->
   service { 'redbox':
     enable     => true,
@@ -24,12 +24,11 @@ define puppet-redbox::add_redbox_package (
     subscribe  => Package[$redbox_package],
   }
 
-  exec { "restart_on_refresh":
+  exec { 'restart_on_refresh':
     command     => "service ${redbox_system} restart",
     tries       => 2,
     try_sleep   => 3,
     refreshonly => true,
-    subscribe   => Puppet-redbox::Update_server_url[$redbox_system],
     user        => 'root',
     cwd         => $target_path,
     logoutput   => true,
