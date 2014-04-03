@@ -18,3 +18,4 @@ define puppet-redbox::update_server_env ($server_path = $title, $tf_env = undef,
       match => "^export SERVER_ENVIRONMENT=.*$",
     }
   }
+}

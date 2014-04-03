@@ -8,7 +8,7 @@ usage() {
 usage
 
 rpm -ivh http://yum.puppetlabs.com/el/6/products/x86_64/puppetlabs-release-6-7.noarch.rpm
-yum install puppet
+yum install -y puppet
 puppet module install puppetlabs/concat
 puppet module install puppetlabs/stdlib
 puppet module install puppetlabs/apache
