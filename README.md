@@ -2,7 +2,7 @@
 This module deploys, installs and runs redbox.
 
 ## Pre-requisites
-*Tested only on CentOS*
+*Tested only on CentOS 6 64bit*
 
 *No support to run without apache proxy server.*
 
