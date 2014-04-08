@@ -19,15 +19,5 @@ define puppet-redbox::update_system_config (
         require   => Package['augeas'],
       }
     }
-
-    if ($system_config[api]) {
-      augeas { "${system_config_path}_api":
-        load_path => $load_path,
-        incl      => $system_config_path,
-        lens      => 'Custom_json.lns',
-        changes   => ["set dict/entry[. = 'api']/dict/entry[. = 'clients']/string \"${system_config[api][clients]}\""],
-        require   => Package['augeas'],
-      }
-    }
   }
 }
