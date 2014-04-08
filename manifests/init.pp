@@ -96,7 +96,8 @@ class puppet-redbox (
     }
     ]),
   $crontab                  = hiera_array(crontab, undef),
-  $tf_env                   = hiera_hash(tf_env, undef),) {
+  $tf_env                   = hiera_hash(tf_env, undef),
+  $system_config            = hiera_hash(system_config, undef)) {
   if ($has_dns and $::fqdn) {
     $server_url = $::fqdn
   } elsif ($::ipaddress) {
@@ -145,6 +146,7 @@ class puppet-redbox (
     has_ssl                  => $has_ssl,
     server_url               => $server_url,
     tf_env                   => $tf_env,
+    system_config            => $system_config,
   } ~> Service['httpd']
 
   if ($crontab) {
