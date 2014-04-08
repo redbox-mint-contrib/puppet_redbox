@@ -9,7 +9,7 @@ This module deploys, installs and runs redbox.
 
 1.Clone/copy puppet-redbox (* you will need bitbucket access *):
 ```
-sudo yum -y install git && git clone git@bitbucket.org:qcifltd/puppet-redbox.git /tmp/puppet-redbox && rm -Rf /tmp/puppet-redbox/.git*
+sudo yum -y install git && git clone git@bitbucket.org:qcifltd/puppet-redbox.git /tmp/puppet-redbox && rm -Rf /tmp/puppet-redbox/.git
 ```
 2.setup puppet for puppet-redbox use (run as root)
 ```
