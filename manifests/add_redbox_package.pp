@@ -25,7 +25,7 @@ define puppet-redbox::add_redbox_package (
     require    => Package[$redbox_package],
   }
 
-  service { ${redbox_system}:
+  service { $redbox_system:
     enable     => true,
     ensure     => running,
     hasstatus  => true,
