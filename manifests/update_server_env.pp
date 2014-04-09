@@ -14,7 +14,7 @@ define puppet-redbox::update_server_env ($server_path = $title, $tf_env = undef,
   if ($tf_env and $tf_env[server_environment]) {
     file_line { "update_server_env_${server_path}":
       path  => $server_path,
-      line  => "export SERVER_ENVIRONMENT=\"dev\"",
+      line  => "export SERVER_ENVIRONMENT=\"${tf_env[server_environment]}\"",
       match => "^export SERVER_ENVIRONMENT=.*$",
     }
   }
