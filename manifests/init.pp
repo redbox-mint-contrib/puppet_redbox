@@ -83,7 +83,8 @@ class puppet-redbox (
     }
     ,
     key   => {
-      file  => "/etc/ssl/local_certs/SSLCertificateKeyFile/%{::fqdn}.key"
+      file => "/etc/ssl/local_certs/SSLCertificateKeyFile/%{::fqdn}.key",
+      mode => 0444
     }
     ,
     chain => {
