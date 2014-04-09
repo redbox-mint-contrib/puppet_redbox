@@ -5,10 +5,10 @@ class puppet-redbox::deploy_script (
   $deploy_parent_directory  = undef,
   $install_parent_directory = undef,
   $owner                    = undef,
-  $archives,
+  $archives                 = undef,
   $server_url               = $::fqdn,
   $has_ssl                  = false,) {
-  $working_directory  = "/home/${owner}"
+  $working_directory = "/home/${owner}"
   $deploy_script_path = "${working_directory}/${script_name}"
 
   concat { $deploy_script_path:
@@ -23,7 +23,7 @@ class puppet-redbox::deploy_script (
     order   => '01',
   }
 
-  puppet-redbox::deploy_archive { $archives: deploy_script_path => $deploy_script_path, } ->
+  puppet-redbox::deploy_archive { [values($archives)]: deploy_script_path => $deploy_script_path, } ->
   exec { "$deploy_script_path":
     cwd       => $working_directory,
     user      => $owner,

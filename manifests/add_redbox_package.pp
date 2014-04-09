@@ -25,12 +25,12 @@ define puppet-redbox::add_redbox_package (
     require    => Package[$redbox_package],
   }
 
-  service { 'redbox':
+  service { ${redbox_system}:
     enable     => true,
     ensure     => running,
     hasstatus  => true,
     hasrestart => true,
-    status     => 'service redbox status | grep "is running"',
+    status     => "service ${redbox_system} status | grep 'is running'",
     subscribe  => Package[$redbox_package],
   }
 

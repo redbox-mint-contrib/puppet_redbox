@@ -44,12 +44,15 @@ class puppet-redbox (
     'deploy/mint']),
   $install_parent_directory = hiera(install_parent_directory, '/opt'),
   $deploy_parent_directory  = hiera(deploy_parent_directory, '/opt/deploy'),
-  $packages                 = hiera_array(packages, [{
+  $packages                 = hiera_hash(packages, {
+    redbox => {
       system  => 'redbox',
       package => 'redbox-rdsi-arms-qcif'
     }
-    ]),
-  $archives                 = hiera_array(archives, [{
+  }
+  ),
+  $archives                 = hiera_hash(archives, {
+    mint => {
       name        => 'mint',
       group       => 'com.googlecode.redbox-mint',
       artifact    => 'mint-local-curation-demo',
@@ -58,7 +61,8 @@ class puppet-redbox (
       classifier  => 'build',
       repo        => 'releases'
     }
-    ]),
+  }
+  ),
   $proxy                    = hiera_array(proxy, [{
       path => '/',
       url  => 'http://localhost:9000/',
@@ -140,7 +144,7 @@ class puppet-redbox (
     owner                    => $redbox_user,
   } ->
   puppet-redbox::add_yum_repo { $yum_repos: } ->
-  puppet-redbox::add_redbox_package { $packages:
+  puppet-redbox::add_redbox_package { [values($packages)]:
     owner                    => $redbox_user,
     install_parent_directory => $install_parent_directory,
     has_ssl                  => $has_ssl,
