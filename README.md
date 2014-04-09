@@ -24,30 +24,12 @@ sudo puppet apply -e "class {'puppet-redbox':}"
 ```
 
 ## Manual configuration needed for:
-* aaf rapid setup in home/system-config.json
 * export apiKey in home/system-config.json
 
 ##TODO:
 * set up using r10k/heat
 * improve way redbox rpm build, yum and puppet integrate
-* tidy up use of redbox-system to name relevant files the redbox package name, not just 'redbox'.
 
-## ssl-config: We use hiera-gpg and a private repo to hold this data.
-Our hiera config uses hashes, which in yaml looks like:
-```
-ssl_config:
-  cert:
-  	file:
-    content: |
-    
-  key:
-  	file:
-    content: |
-    
-  chain:
-  	file:
-    content: |
-```
 License
 -------
 See file, LICENCE
