@@ -47,7 +47,7 @@ class puppet-redbox (
   $packages                 = hiera_hash(packages, {
     redbox => {
       system  => 'redbox',
-      package => 'redbox-rdsi-arms-qcif'
+      package => 'redbox-build-dev-all'
     }
   }
   ),
