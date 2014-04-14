@@ -2,12 +2,12 @@ define puppet-redbox::add_redbox_package (
   $packages                 = $title,
   $owner                    = undef,
   $install_parent_directory = undef,
-  $has_ssl                  = undef,
-  $server_url               = undef,
+  $has_ssl                  = undef,  
   $tf_env                   = undef,
   $system_config            = undef,) {
   $redbox_package = $packages[package]
   $redbox_system = $packages[system]
+  $server_url = $packages[server_url]
 
   package { $redbox_package: }
 

@@ -30,7 +30,7 @@
 # === Authors
 #
 # Matt Mulholland <matt@redboxresearchdata.com.au>
-#
+# <a href="https://github.com/shilob">Shilo Banihit</a>
 # === Copyright
 #
 # Copyright 2013 Your name here, unless otherwise noted.
@@ -47,7 +47,8 @@ class puppet-redbox (
   $packages                 = hiera_hash(packages, {
     redbox => {
       system  => 'redbox',
-      package => 'redbox-build-dev-all'
+      package => 'redbox-build-dev-all',
+      server_url=> "${::ipaddress}/redbox"
     }
   }
   ),
@@ -105,8 +106,8 @@ class puppet-redbox (
   $system_config            = hiera_hash(system_config, undef)) {
   if ($has_dns and $::fqdn) {
     $server_url = $::fqdn
-  } elsif ($::ipaddress) {
-    $server_url = "${::ipaddress}/redbox"
+  } elsif ($::ipaddress) {    
+    $server_url = $::ipaddress
   } else {
     $server_url = $::ipaddress_lo
   }
@@ -148,8 +149,7 @@ class puppet-redbox (
   puppet-redbox::add_redbox_package { [values($packages)]:
     owner                    => $redbox_user,
     install_parent_directory => $install_parent_directory,
-    has_ssl                  => $has_ssl,
-    server_url               => $server_url,
+    has_ssl                  => $has_ssl,    
     tf_env                   => $tf_env,
     system_config            => $system_config,
   } ~> Service['httpd']
