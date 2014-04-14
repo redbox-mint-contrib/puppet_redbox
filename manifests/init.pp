@@ -106,7 +106,7 @@ class puppet-redbox (
   if ($has_dns and $::fqdn) {
     $server_url = $::fqdn
   } elsif ($::ipaddress) {
-    $server_url = $::ipaddress
+    $server_url = "${::ipaddress}/redbox"
   } else {
     $server_url = $::ipaddress_lo
   }
