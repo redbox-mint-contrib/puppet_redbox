@@ -65,8 +65,11 @@ class puppet-redbox (
   }
   ),
   $proxy                    = hiera_array(proxy, [{
-      path => '/',
-      url  => 'http://localhost:9000/',
+      path => '/redbox',
+      url  => 'http://localhost:9000/redbox',
+    },{
+      path => '/mint',
+      url  => 'http://localhost:9001/mint',
     }
     ]),
   $has_dns                  = hiera(has_dns, false),
