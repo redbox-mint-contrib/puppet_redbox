@@ -7,9 +7,9 @@ This module deploys, installs and runs redbox.
 *No support to run without apache proxy server.*
 
 
-1.Clone/copy puppet-redbox (* you will need bitbucket access *):
+1.Clone/copy puppet-redbox
 ```
-sudo yum -y install git && git clone git@bitbucket.org:qcifltd/puppet-redbox.git /tmp/puppet-redbox && rm -Rf /tmp/puppet-redbox/.git
+sudo yum -y install git && git clone https://github.com/redbox-mint-contrib/puppet-redbox.git /tmp/puppet-redbox && rm -Rf /tmp/puppet-redbox/.git
 ```
 2.setup puppet for puppet-redbox use (run as root)
 ```
@@ -33,12 +33,3 @@ sudo puppet apply -e "class {'puppet-redbox':}"
 License
 -------
 See file, LICENCE
-
-Contact
--------
-
-
-Support
--------
-
-Please log tickets and issues at our [Projects site](http://projects.example.com)

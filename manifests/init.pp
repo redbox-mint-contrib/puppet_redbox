@@ -47,29 +47,25 @@ class puppet-redbox (
   $packages                 = hiera_hash(packages, {
     redbox => {
       system  => 'redbox',
-      package => 'redbox-build-dev-all',
+      package => 'redbox-distro',
       server_url=> "${::ipaddress}/redbox"
+    },
+    mint => {
+      system  => 'mint',
+      package => 'mint-distro',
+      server_url=> "${::ipaddress}/mint"
     }
   }
   ),
-  $archives                 = hiera_hash(archives, {
-    mint => {
-      name        => 'mint',
-      group       => 'com.googlecode.redbox-mint',
-      artifact    => 'mint-local-curation-demo',
-      web_context => 'mint',
-      version     => '1.6.2',
-      classifier  => 'build',
-      repo        => 'releases'
-    }
+  $archives                 = hiera_hash(archives, {    
   }
   ),
   $proxy                    = hiera_array(proxy, [{
       path => '/redbox',
-      url  => 'http://localhost:9000/redbox',
+      url  => 'http://localhost:9000/redbox'
     },{
       path => '/mint',
-      url  => 'http://localhost:9001/mint',
+      url  => 'http://localhost:9001/mint'
     }
     ]),
   $has_dns                  = hiera(has_dns, false),
