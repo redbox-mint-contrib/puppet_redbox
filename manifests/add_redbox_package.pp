@@ -44,4 +44,5 @@ define puppet-redbox::add_redbox_package (
     logoutput   => true,
   }
 
+  puppet-redbox::add_tidy { $redbox_system: }
 }

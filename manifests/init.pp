@@ -61,11 +61,11 @@ class puppet-redbox (
   }
   ),
   $proxy                    = hiera_array(proxy, [{
-      path => '/redbox',
-      url  => 'http://localhost:9000/redbox'
-    },{
       path => '/mint',
       url  => 'http://localhost:9001/mint'
+    },{
+      path => '/redbox',
+      url  => 'http://localhost:9000/redbox'
     }
     ]),
   $has_dns                  = hiera(has_dns, false),
@@ -134,6 +134,10 @@ class puppet-redbox (
       ssl_config => $ssl_config,
       proxy      => $proxy,
     } ~> Service['httpd']
+    
+    Class['Puppet-redbox::Deploy_script'] ~> Service['httpd']
+    Puppet-redbox::Add_redbox_package[values($packages)] ~> Service['httpd']
+    
   }
 
   class { 'puppet-redbox::deploy_script':
@@ -151,7 +155,7 @@ class puppet-redbox (
     has_ssl                  => $has_ssl,    
     tf_env                   => $tf_env,
     system_config            => $system_config,
-  } ~> Service['httpd']
+  }
 
   if ($crontab) {
     puppet-redbox::add_cron { $crontab: }
