@@ -45,25 +45,29 @@ class puppet-redbox (
   $install_parent_directory = hiera(install_parent_directory, '/opt'),
   $deploy_parent_directory  = hiera(deploy_parent_directory, '/opt/deploy'),
   $packages                 = hiera_hash(packages, {
-    redbox => {
-      system  => 'redbox',
-      package => 'redbox-distro',
-      server_url=> "${::ipaddress}/redbox"
-    },
-    mint => {
-      system  => 'mint',
-      package => 'mint-distro',
-      server_url=> "${::ipaddress}/mint"
+    redbox             => {
+      system             => 'redbox',
+      package            => 'redbox-distro',
+      server_url_context => 'redbox',
+    }
+    ,
+    mint               => {
+      system             => 'mint',
+      package            => 'mint-distro',
+      server_url_context => 'mint',
     }
   }
   ),
-  $archives                 = hiera_hash(archives, {    
+  $archives                 = hiera_hash(archives, {
   }
   ),
-  $proxy                    = hiera_array(proxy, [{
+  $proxy                    = hiera_array(proxy, [
+    {
       path => '/mint',
       url  => 'http://localhost:9001/mint'
-    },{
+    }
+    ,
+    {
       path => '/redbox',
       url  => 'http://localhost:9000/redbox'
     }
@@ -105,7 +109,7 @@ class puppet-redbox (
   $system_config            = hiera_hash(system_config, undef)) {
   if ($has_dns and $::fqdn) {
     $server_url = $::fqdn
-  } elsif ($::ipaddress) {    
+  } elsif ($::ipaddress) {
     $server_url = $::ipaddress
   } else {
     $server_url = $::ipaddress_lo
@@ -134,10 +138,10 @@ class puppet-redbox (
       ssl_config => $ssl_config,
       proxy      => $proxy,
     } ~> Service['httpd']
-    
+
     Class['Puppet-redbox::Deploy_script'] ~> Service['httpd']
     Puppet-redbox::Add_redbox_package[values($packages)] ~> Service['httpd']
-    
+
   }
 
   class { 'puppet-redbox::deploy_script':
@@ -147,14 +151,16 @@ class puppet-redbox (
     install_parent_directory => $install_parent_directory,
     deploy_parent_directory  => $deploy_parent_directory,
     owner                    => $redbox_user,
-  } ->
+  }
+
   puppet-redbox::add_yum_repo { $yum_repos: } ->
   puppet-redbox::add_redbox_package { [values($packages)]:
     owner                    => $redbox_user,
     install_parent_directory => $install_parent_directory,
-    has_ssl                  => $has_ssl,    
+    has_ssl                  => $has_ssl,
     tf_env                   => $tf_env,
     system_config            => $system_config,
+    base_server_url          => $server_url,
   }
 
   if ($crontab) {

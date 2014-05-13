@@ -2,12 +2,17 @@ define puppet-redbox::add_redbox_package (
   $packages                 = $title,
   $owner                    = undef,
   $install_parent_directory = undef,
-  $has_ssl                  = undef,  
+  $has_ssl                  = undef,
   $tf_env                   = undef,
-  $system_config            = undef,) {
+  $system_config            = undef,
+  $base_server_url          = undef,) {
+  if ($packages[server_url_context]) {
+    $server_url = "${base_server_url}/${packages[server_url_context]}"
+  } else {
+    $server_url = $base_server_url
+  }
   $redbox_package = $packages[package]
   $redbox_system = $packages[system]
-  $server_url = $packages[server_url]
 
   package { $redbox_package: }
 
@@ -40,9 +45,11 @@ define puppet-redbox::add_redbox_package (
     try_sleep   => 3,
     refreshonly => true,
     user        => 'root',
-    cwd         => $target_path,
+    notify      => Puppet-redbox::Prime_system[$server_url],
     logoutput   => true,
   }
 
-  puppet-redbox::add_tidy { $redbox_system: }
+  puppet-redbox::prime_system { $server_url: require => Service[$redbox_system], }
+
+  puppet-redbox::add_tidy { $redbox_system: require => Service[$redbox_system], }
 }

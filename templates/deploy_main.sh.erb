@@ -103,6 +103,20 @@ install_deployed_files() {
 	rm -rf <%= @deploy_parent_directory %>/${redbox_system}/*
 }
 
+prime() {
+	echo "Sleep...then prime mint."
+	server_url=<%= @server_url %>
+	if [ $# -gt 0 ]; then
+		server_url="${server_url}/$1"
+	fi
+	echo "Including relative web context, which is now ${server_url}"
+	
+	sleep 20
+	echo "Priming..."
+	wget --spider "${server_url}"
+
+}
+
 ########################## Main ##########################
 deploy() {
 	redbox_system=$1	
@@ -127,6 +141,7 @@ deploy() {
 	mv -f <%= @working_directory %>/${redbox_system}.<%= @new_extension %> <%= @working_directory %>/${redbox_system}.<%= @old_extension %>
 	echo "Restarting: <%= @install_parent_directory%>/${redbox_system}/server/tf.sh"
 	<%= @install_parent_directory%>/${redbox_system}/server/tf.sh restart || exit_deploy
+	prime ${web_context} || exit_deploy
 }
 if [ `whoami` != "<%= @owner %>" ]; then
 	exit_deploy "Usage: sudo -Hu <%= @owner %> <%= @working_directory %>/$(basename $0)"

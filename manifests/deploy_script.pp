@@ -6,7 +6,7 @@ class puppet-redbox::deploy_script (
   $install_parent_directory = undef,
   $owner                    = undef,
   $archives                 = undef,
-  $server_url               = $::fqdn,
+  $server_url               = undef,
   $has_ssl                  = false,) {
   $working_directory = "/home/${owner}"
   $deploy_script_path = "${working_directory}/${script_name}"
