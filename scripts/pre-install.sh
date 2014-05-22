@@ -9,9 +9,9 @@ usage
 
 rpm -ivh http://yum.puppetlabs.com/el/6/products/x86_64/puppetlabs-release-6-7.noarch.rpm
 yum install -y puppet
-puppet module install puppetlabs/concat
-puppet module install puppetlabs/stdlib
-puppet module install puppetlabs/apache
+puppet module install --version 1.0.2 puppetlabs/concat
+puppet module install --version 4.1.0 puppetlabs/stdlib
+puppet module install --version 1.0.1 puppetlabs/apache
 
 echo "checking puppet-redbox cloned/copied to /tmp"
 find /tmp -maxdepth 1 -iname "puppet-redbox" || exit 1
