@@ -36,6 +36,7 @@
 # Copyright 2013 Your name here, unless otherwise noted.
 #
 class puppet-redbox (
+  $install_type             = 'basic',
   $redbox_user              = hiera(redbox_user, 'redbox'),
   $directories              = hiera_array(directories, [
     'redbox',
@@ -70,6 +71,10 @@ class puppet-redbox (
     {
       path => '/redbox',
       url  => 'http://localhost:9000/redbox'
+    },
+    {
+        path => '/oai-server',
+        url  => 'http://localhost:8080/oai-server'
     }
     ]),
   $has_dns                  = hiera(has_dns, false),
@@ -107,63 +112,68 @@ class puppet-redbox (
   $crontab                  = hiera_array(crontab, undef),
   $tf_env                   = hiera_hash(tf_env, undef),
   $system_config            = hiera_hash(system_config, undef)) {
-  if ($has_dns and $::fqdn) {
-    $server_url = $::fqdn
-  } elsif ($::ipaddress) {
-    $server_url = $::ipaddress
-  } else {
-    $server_url = $::ipaddress_lo
-  }
-
-  host { [$::fqdn, $::hostname]: ip => $::ipaddress, }
-
-  Exec {
-    path      => $exec_path,
-    logoutput => false,
-  }
-
-  puppet-redbox::add_systemuser { $redbox_user: } ->
-  add_directory { $directories:
-    owner            => $redbox_user,
-    parent_directory => $install_parent_directory,
-  } ->
-  class { 'puppet-redbox::java': }
-
-  if ($proxy) {
-    class { 'puppet-redbox::add_proxy_server':
-      require    => Class['Puppet-redbox::Java'],
-      before     => [Puppet-redbox::Add_redbox_package[values($packages)], Class['Puppet-redbox::deploy_script']],
-      server_url => $server_url,
-      has_ssl    => $has_ssl,
-      ssl_config => $ssl_config,
-      proxy      => $proxy,
-    } ~> Service['httpd']
-
-    Class['Puppet-redbox::Deploy_script'] ~> Service['httpd']
-    Puppet-redbox::Add_redbox_package[values($packages)] ~> Service['httpd']
-
-  }
-
-  class { 'puppet-redbox::deploy_script':
-    archives                 => $archives,
-    has_ssl                  => $has_ssl,
-    server_url               => $server_url,
-    install_parent_directory => $install_parent_directory,
-    deploy_parent_directory  => $deploy_parent_directory,
-    owner                    => $redbox_user,
-  }
-
-  puppet-redbox::add_yum_repo { $yum_repos: } ->
-  puppet-redbox::add_redbox_package { [values($packages)]:
-    owner                    => $redbox_user,
-    install_parent_directory => $install_parent_directory,
-    has_ssl                  => $has_ssl,
-    tf_env                   => $tf_env,
-    system_config            => $system_config,
-    base_server_url          => $server_url,
-  }
-
-  if ($crontab) {
-    puppet-redbox::add_cron { $crontab: }
-  }
+    
+	  if ($has_dns and $::fqdn) {
+	    $server_url = $::fqdn
+	  } elsif ($::ipaddress) {
+	    $server_url = $::ipaddress
+	  } else {
+	    $server_url = $::ipaddress_lo
+	  }
+	
+	  host { [$::fqdn, $::hostname]: ip => $::ipaddress, }
+	
+	  Exec {
+	    path      => $exec_path,
+	    logoutput => false,
+	  }
+	
+	  puppet-redbox::add_systemuser { $redbox_user: } ->
+	  add_directory { $directories:
+	    owner            => $redbox_user,
+	    parent_directory => $install_parent_directory,
+	  } ->
+	  class { 'puppet-redbox::java': }
+	
+	  if ($proxy) {
+	    class { 'puppet-redbox::add_proxy_server':
+	      require    => Class['Puppet-redbox::Java'],
+	      before     => [Puppet-redbox::Add_redbox_package[values($packages)], Class['Puppet-redbox::deploy_script']],
+	      server_url => $server_url,
+	      has_ssl    => $has_ssl,
+	      ssl_config => $ssl_config,
+	      proxy      => $proxy,
+	    } ~> Service['httpd']
+	
+	    Class['Puppet-redbox::Deploy_script'] ~> Service['httpd']
+	    Puppet-redbox::Add_redbox_package[values($packages)] ~> Service['httpd']
+	
+	  }
+	
+	  class { 'puppet-redbox::deploy_script':
+	    archives                 => $archives,
+	    has_ssl                  => $has_ssl,
+	    server_url               => $server_url,
+	    install_parent_directory => $install_parent_directory,
+	    deploy_parent_directory  => $deploy_parent_directory,
+	    owner                    => $redbox_user,
+	  }
+	
+	  puppet-redbox::add_yum_repo { $yum_repos: } ->
+	  puppet-redbox::add_redbox_package { [values($packages)]:
+	    owner                    => $redbox_user,
+	    install_parent_directory => $install_parent_directory,
+	    has_ssl                  => $has_ssl,
+	    tf_env                   => $tf_env,
+	    system_config            => $system_config,
+	    base_server_url          => $server_url,
+	  }
+	
+	  if ($crontab) {
+	    puppet-redbox::add_cron { $crontab: }
+	  }
+	  # Check flag whether to install OAIPMH stack
+	  if $install_type == 'oaipmh-complete' {
+	     puppet-redbox::add_oaipmh_stack { "/opt/harvester/": }
+	  }
 }
