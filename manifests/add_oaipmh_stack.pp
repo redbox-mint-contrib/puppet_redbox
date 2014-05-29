@@ -78,25 +78,32 @@ define puppet-redbox::add_oaipmh_stack (
     command => "${wget_cmd} ${$oaiserver_config_src}${oaiserver_init_sql} && psql -U oaiserver < ${oaiserver_init_sql}",
     path    => ['/usr/bin','/usr/sbin', '/bin']
   }
+  
   # Install Tomcat and install app WARs and their configuration
   service {"Stop any existing Tomcat":
     ensure    => stopped,
     hasstatus => false,
     status    => "cat /var/run/tomcat/tomcat7.pid",
     stop      => "kill `cat /var/run/tomcat/tomcat7.pid` && rm -rf /var/run/tomcat/tomcat7.pid",
+  } -> user {"Add tomcat user":
+    name    => "tomcat",
+    ensure  => present,
+  } -> file {"/home/tomcat":
+      ensure => directory,
+      owner => "tomcat",
   } -> exec { "Download Tomcat Bundle":
     cwd     => '/tmp/',
     creates => "/tmp/${tomcat_package}",
     command => "rm -rf ${tomcat_install} && ${wget_cmd} ${tomcat_package_url}${tomcat_package}",
     path    => ['/usr/bin','/usr/sbin', '/bin', '/sbin']
-  } -> user {"Add tomcat user":
-    name    => "tomcat",
-    ensure  => "present",
   } -> exec {"Extract Tomcat Bundle to Tomcat install directory":
     cwd       => '/tmp/', 
     creates   => '/tmp/${tomcat_package_dir}',
     command   => "tar xzf ${tomcat_package} && mv -f ${tomcat_package_dir} ${tomcat_install} && rm -rf ${tomcat_package} && curl -o ${tomcat_install}/bin/setenv.sh ${oaiserver_config_src}setenv.sh && chmod +x ${tomcat_install}/bin/setenv.sh && chown -R tomcat:tomcat ${tomcat_install} && curl -o /etc/init.d/tomcat7 ${oaiserver_config_src}tomcat7 && chmod +x /etc/init.d/tomcat7",
     path      => ['/usr/bin','/usr/sbin', '/bin', '/sbin']
+  } -> file {"${harvester_install_dir}":
+      ensure => directory,
+      owner => "tomcat",
   } -> file {"${harvester_install_dir}${hm_workdir}":
     ensure  => directory,
     owner   => "tomcat"
