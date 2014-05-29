@@ -44,5 +44,11 @@ if [ ! -z "$1" ]; then
 	fi
 fi
 
+# Check if we have Hiera and if so, install it.
+if [ -e /tmp/puppet-hiera-redbox/scripts/install.sh ]; then
+  echo "Running Hiera install script..."
+  /tmp/puppet-hiera-redbox/scripts/install.sh
+fi
+
 # Install ReDBox
 puppet apply -e "class {'puppet-redbox': install_type=>'$INSTALL_TYPE'}"
