@@ -26,8 +26,11 @@ define puppet-redbox::add_oaipmh_stack (
   $cm_handler_key_url="https://github.com/redbox-mint/curation-manager/raw/master/web-app/WEB-INF/conf/spring/handle/admpriv.bin",
   $oaiharvester_package="redbox-oaipmh-feed.zip",
   $oaiharvester_package_url="http://dev.redboxresearchdata.com.au/nexus/service/local/artifact/maven/redirect?r=snapshots&g=au.com.redboxresearchdata.oai&a=redbox-oai-feed&v=LATEST&e=zip&c=bin",
-  $hm_url="http://localhost:8080/json-harvester-manager/harvester/",
   $oaiharvester_id="redbox-oai-pmh-feed",
+  $mintcsvharvester_package="mint-csvjdbc-harvester.zip",
+  $mintcsvharvester_package_url="http://dev.redboxresearchdata.com.au/nexus/service/local/artifact/maven/redirect?r=snapshots&g=au.com.redboxresearchdata&a=mint-csvjdbc-harvester&v=LATEST&e=zip&c=bin",
+  $mintcsvharvester_id="mint-csvjdbc",
+  $hm_url="http://localhost:8080/json-harvester-manager/harvester/",
   $oaiharvester_samplehelper = "https://raw.githubusercontent.com/redbox-harvester/redbox-oai-feed/master/support/install/addSampleRecord.groovy",
   $oaiserver_formats_url = "http://localhost/oai-server/?verb=ListMetadataFormats",
   $groovy_version="2.2.2",
@@ -144,7 +147,15 @@ define puppet-redbox::add_oaipmh_stack (
     path    => ['/usr/bin','/usr/sbin', '/bin', '/sbin']
   } -> exec {"Starting OAI-PMH FEED harvester":
     cwd     => "/tmp",
-    command => "curl -o harvester.check -i -H 'Accept: application/json' '${hm_url}start/${oaiharvester_id}'",
+    command => "curl -o ${oaiharvester_id}_harvester.check -i -H 'Accept: application/json' '${hm_url}start/${oaiharvester_id}'",
+    path    => ['/usr/bin','/usr/sbin', '/bin', '/sbin']
+  } -> exec {"Install Mint CSVJDBC harvester":
+    cwd     => "/tmp",
+    command => "curl -L -o ${mintcsvharvester_package} '${mintcsvharvester_package_url}' && curl -i -F 'harvesterPackage=@${mintcsvharvester_package}' -H 'Accept: application/json' '${hm_url}upload/${mintcsvharvester_id}' && curl -o harvester.check -i -H 'Accept: application/json' '${hm_url}' &&  grep '${mintcsvharvester_id}' harvester.check >/dev/null",
+    path    => ['/usr/bin','/usr/sbin', '/bin', '/sbin']
+  } -> exec {"Starting Mint CSVJDBC harvester":
+    cwd     => "/tmp",
+    command => "curl -o ${mintcsvharvester_id}_harvester.check -i -H 'Accept: application/json' '${hm_url}start/${mintcsvharvester_id}'",
     path    => ['/usr/bin','/usr/sbin', '/bin', '/sbin']
   } -> package {"Install unzip":
       name  => "unzip",
