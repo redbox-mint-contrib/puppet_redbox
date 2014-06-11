@@ -35,11 +35,11 @@ rm -Rf /tmp/puppet-redbox
 # Check if we have to install other components, purposely injected here to make Hiera optional.
 INSTALL_TYPE="basic"
 if [ ! -z "$1" ]; then
-	if [ "$1" = "oaipmh-complete" ]; then
+	if [ "$1" = "harvester-complete" ]; then
 		INSTALL_TYPE="$1"
 		puppet module install --version 3.3.3 puppetlabs/postgresql
 	else if [ ! "$1" = "basic" ]; then
-			echo "Invalid installation type, specify 'basic' or 'oaipmh-complete'"
+			echo "Invalid installation type, specify 'basic' or 'harvester-complete'"
 		exit 1
 		fi
 	fi

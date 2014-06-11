@@ -172,8 +172,8 @@ class puppet-redbox (
 	  if ($crontab) {
 	    puppet-redbox::add_cron { $crontab: }
 	  }
-	  # Check flag whether to install OAIPMH stack
-	  if $install_type == 'oaipmh-complete' {
-	     puppet-redbox::add_oaipmh_stack { "/opt/harvester/": }
+	  # Check flag whether to install Harvester stack
+	  if $install_type == 'harvester-complete' {
+	     puppet-redbox::add_harvesters_complete { "/opt/harvester/": }
 	  }
 }

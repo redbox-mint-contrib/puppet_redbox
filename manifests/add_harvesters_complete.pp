@@ -1,6 +1,6 @@
-define puppet-redbox::add_oaipmh_stack (
+define puppet-redbox::add_harvesters_complete (
   $harvester_install_dir = $title,
-  $pgsql_version = "9.3",
+  $pgsql_version = "9.2",
   $tomcat_install = "/opt/tomcat7",
   $tomcat_package_url = "http://dev.redboxresearchdata.com.au/jdk/",
   $tomcat_package = "apache-tomcat-7.0.22.tar.gz",
@@ -36,6 +36,9 @@ define puppet-redbox::add_oaipmh_stack (
   $groovy_version="2.2.2",
   $groovy_install_url="http://dl.bintray.com/groovy/maven/groovy-binary-",
   $groovy_install_dir="/opt/groovy",
+  $logRotateConf = "tomcatLogRotate",
+  $isReadyScript = "isready.sh",
+  $timestamp = generate('/bin/date', '+%Y-%m-%d_%H-%M-%S')
   ) {
   ## Install Postgres
   class { 'postgresql::globals':
@@ -79,7 +82,16 @@ define puppet-redbox::add_oaipmh_stack (
     database => 'all',
     user => 'all',
     auth_method => 'trust',
-  } 
+  }
+   
+  file { '/opt/postgresql':
+    ensure => directory,
+	} ->
+	file { '/var/lib/postgresql':
+	  ensure  => link,
+	  target  => '/opt/postgresql',
+	  before  => Class['::postgresql::server::install'],
+	}
   
   # Install Tomcat and install app WARs and their configuration
   service {"Stop any existing Tomcat":
@@ -136,15 +148,31 @@ define puppet-redbox::add_oaipmh_stack (
     cwd     => '/tmp',
     command => "${wget_cmd} ${oaiserver_config_src}${oaiserver_init_sql} && psql -U oaiserver < ${oaiserver_init_sql}",
     path    => ['/usr/bin','/usr/sbin', '/bin'],
+  }-> exec { "Move out current Tomcat catalina.out":
+    cwd   => "${tomcat_install}/logs",
+    command => "mv catalina.out catalina_${timestamp}",
+    path    => ['/usr/bin','/usr/sbin', '/bin'],
+    onlyif  => "ls -l catalina.out",
+  } -> exec { "Download helper script and logrotateConf":
+    cwd   => "${harvester_install_dir}",
+    command => "${wget_cmd} ${oaiserver_config_src}${isReadyScript} && chmod +x ${isReadyScript} && ${wget_download_cmd} /etc/logrotate.d/${logRotateConf} ${oaiserver_config_src}${logRotateConf}",
+    path    => ['/usr/bin','/usr/sbin', '/bin'],
+    unless  => "ls -l ${isReadyScript}",
   } -> service {"Configure Tomcat service":
     name => "tomcat7",
     ensure => running,
     hasrestart => true,
     enable => true
-  } -> exec {"Install OAI-PMH FEED harvester":
+  } -> exec { "Wait for Tomcat to be ready.":
+    cwd   => "${harvester_install_dir}",
+    command => "./${isReadyScript} '${tomcat_install}/logs/catalina.out' 'Tomcat' 'Server startup'",
+    path    => ['/usr/bin','/usr/sbin', '/bin', "${harvester_install_dir}"],
+    onlyif  => "ls -l ${tomcat_install}/logs/catalina.out",
+  }-> exec {"Install OAI-PMH FEED harvester":
     cwd     => "/tmp",
     command => "curl -L -o ${oaiharvester_package} '${oaiharvester_package_url}' && curl -i -F 'harvesterPackage=@${oaiharvester_package}' -H 'Accept: application/json' '${hm_url}upload/${oaiharvester_id}' && curl -o harvester.check -i -H 'Accept: application/json' '${hm_url}' &&  grep '${oaiharvester_id}' harvester.check >/dev/null",
-    path    => ['/usr/bin','/usr/sbin', '/bin', '/sbin']
+    path    => ['/usr/bin','/usr/sbin', '/bin', '/sbin'],
+    unless  => "ls /opt/harvester/${hm_workdir}/harvest/${oaiharvester_id}"
   } -> exec {"Starting OAI-PMH FEED harvester":
     cwd     => "/tmp",
     command => "curl -o ${oaiharvester_id}_harvester.check -i -H 'Accept: application/json' '${hm_url}start/${oaiharvester_id}'",
@@ -152,7 +180,8 @@ define puppet-redbox::add_oaipmh_stack (
   } -> exec {"Install Mint CSVJDBC harvester":
     cwd     => "/tmp",
     command => "curl -L -o ${mintcsvharvester_package} '${mintcsvharvester_package_url}' && curl -i -F 'harvesterPackage=@${mintcsvharvester_package}' -H 'Accept: application/json' '${hm_url}upload/${mintcsvharvester_id}' && curl -o harvester.check -i -H 'Accept: application/json' '${hm_url}' &&  grep '${mintcsvharvester_id}' harvester.check >/dev/null",
-    path    => ['/usr/bin','/usr/sbin', '/bin', '/sbin']
+    path    => ['/usr/bin','/usr/sbin', '/bin', '/sbin'],
+    unless  => "ls /opt/harvester/${hm_workdir}/harvest/${mintcsvharvester_id}"
   } -> exec {"Starting Mint CSVJDBC harvester":
     cwd     => "/tmp",
     command => "curl -o ${mintcsvharvester_id}_harvester.check -i -H 'Accept: application/json' '${hm_url}start/${mintcsvharvester_id}'",
