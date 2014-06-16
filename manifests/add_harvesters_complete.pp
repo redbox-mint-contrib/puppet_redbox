@@ -102,12 +102,6 @@ define puppet-redbox::add_harvesters_complete (
     status    => "cat /var/run/tomcat/tomcat7.pid",
     stop      => "kill `cat /var/run/tomcat/tomcat7.pid` && rm -rf /var/run/tomcat/tomcat7.pid",
     require  => Class['postgresql::server'],
-  } -> user {"Add tomcat user":
-    name    => "tomcat",
-    ensure  => present,
-  } -> file {"/home/tomcat":
-      ensure => directory,
-      owner => "tomcat",
   } -> exec { "Download Tomcat Bundle":
     cwd     => '/tmp/',
     creates => "/tmp/${tomcat_package}",
@@ -229,7 +223,13 @@ define puppet-redbox::add_harvesters_complete (
   
   
   if ($mintHarvesterSshKey == undef) {
-     user {"Creating user '${mintHarvesterUser}'":
+		  user {"Add tomcat user":
+		    name    => "tomcat",
+		    ensure  => present,
+		  } -> file {"/home/tomcat":
+		      ensure => directory,
+		      owner => "tomcat",
+		  } -> user {"Creating user '${mintHarvesterUser}'":
 		      name    => "${mintHarvesterUser}",
 		      ensure  => present,
 		      groups  => ["tomcat"],
@@ -238,20 +238,24 @@ define puppet-redbox::add_harvesters_complete (
 		       owner => "${mintHarvesterUser}",
 		       group => "${mintHarvesterUser}",
 		       mode  => 0700
-		  } -> file {"/home/${mintHarvesterUser}/.ssh ":
+		  } -> file {"/home/${mintHarvesterUser}/.ssh":
 		       ensure  => directory,
 		       owner => "${mintHarvesterUser}",
 		       group => "${mintHarvesterUser}",
 		       mode  => 0700
-		  } ->
-     exec {"Use public SSH key used in instance creation for user '${mintHarvesterUser}'":
-      command => "cp -R /home/ec2-user/.ssh/authorized_keys /home/${mintHarvesterUser}/.ssh/authorized_keys && chown -R ${mintHarvesterUser}:${mintHarvesterUser} /home/${mintHarvesterUser}/.ssh && chmod -R go-rwx /home/${mintHarvesterUser}/.ssh",
-      path    => ['/usr/bin','/usr/sbin', '/bin'],
-      unless  => "ls /home/${mintHarvesterUser}/.ssh",
-      require => User["Creating user '${mintHarvesterUser}'"]
-    }
+		  } -> exec {"Use public SSH key used in instance creation for user '${mintHarvesterUser}'":
+		      command => "cp -R /home/ec2-user/.ssh/authorized_keys /home/${mintHarvesterUser}/.ssh/authorized_keys && chown -R ${mintHarvesterUser}:${mintHarvesterUser} /home/${mintHarvesterUser}/.ssh && chmod -R go-rwx /home/${mintHarvesterUser}/.ssh",
+		      path    => ['/usr/bin','/usr/sbin', '/bin'],
+		      unless  => "ls /home/${mintHarvesterUser}/.ssh",
+	    }
   } else {
-      user {"Creating user '${mintHarvesterUser}'":
+      user {"Add tomcat user":
+        name    => "tomcat",
+        ensure  => present,
+      } -> file {"/home/tomcat":
+          ensure => directory,
+          owner => "tomcat",
+      } -> user {"Creating user '${mintHarvesterUser}'":
 		      name    => "${mintHarvesterUser}",
 		      ensure  => present,
 		      groups  => ["tomcat"],
@@ -260,20 +264,18 @@ define puppet-redbox::add_harvesters_complete (
 		       owner => "${mintHarvesterUser}",
 		       group => "${mintHarvesterUser}",
 		       mode  => 0700
-		  } -> file {"/home/${mintHarvesterUser}/.ssh ":
+		  } -> file {"/home/${mintHarvesterUser}/.ssh":
 		       ensure  => directory,
 		       owner => "${mintHarvesterUser}",
 		       group => "${mintHarvesterUser}",
 		       mode  => 0700
-		  } ->
-     ssh_authorized_key {"Injecting Public SSH Key for user '${mintHarvesterUser}'":
-         name   => "${mintHarvesterUser}",
-         ensure => present,
-         key    => "${mintHarvesterSshKey}",
-         user   => "${$mintHarvesterUser}",
-         require  => User["Creating user '${mintHarvesterUser}'"],
-         type => ssh-rsa
-     }  
+		  } -> ssh_authorized_key {"Injecting Public SSH Key for user '${mintHarvesterUser}'":
+	         name   => "${mintHarvesterUser}",
+	         ensure => present,
+	         key    => "${mintHarvesterSshKey}",
+	         user   => "${$mintHarvesterUser}",
+	         type => ssh-rsa
+      }  
   }
   include postgresql::server
 }
