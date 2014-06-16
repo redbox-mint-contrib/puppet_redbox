@@ -49,6 +49,12 @@ fi
 if [ -e /tmp/puppet-hiera-redbox/scripts/install.sh ]; then
   echo "Running Hiera install script..."
   /tmp/puppet-hiera-redbox/scripts/install.sh
+  MAIN_PUPPET_CONFIG=`puppet config print config`
+  PUPPET_ENV = $2
+  if [ ! -z "$PUPPET_ENV" ]; then
+    echo "[user]" >> $MAIN_PUPPET_CONFIG
+    echo "   environment = $PUPPET_ENV" >> $MAIN_PUPPET_CONFIG 
+  fi
 fi
 
 # Install ReDBox

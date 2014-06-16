@@ -6,7 +6,10 @@ define puppet-redbox::add_redbox_package (
   $tf_env                   = undef,
   $system_config            = undef,
   $base_server_url          = undef,) {
-  if ($packages[server_url_context]) {
+  
+  if ($packages[base_server_url]) {
+    $server_url = $packages[base_server_url] 
+  } elsif ($packages[server_url_context]) {
     $server_url = "${base_server_url}/${packages[server_url_context]}"
   } else {
     $server_url = $base_server_url

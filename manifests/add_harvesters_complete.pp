@@ -1,44 +1,46 @@
 define puppet-redbox::add_harvesters_complete (
-  $harvester_install_dir = $title,
-  $pgsql_version = "9.2",
-  $tomcat_install = "/opt/tomcat7",
-  $tomcat_package_url = "http://dev.redboxresearchdata.com.au/jdk/",
-  $tomcat_package = "apache-tomcat-7.0.22.tar.gz",
-  $tomcat_package_dir ="apache-tomcat-7.0.22",
-  $oaiserver_config_src = "https://raw.githubusercontent.com/redbox-mint/oai-server/master/support/install/",
-  $oaiserver_init_sql = "init.sql",
-  $cm_spring_idp_config_src = "https://raw.githubusercontent.com/redbox-mint/curation-manager/master/web-app/WEB-INF/conf/spring/identityProdiverServiceProperties/",
-  $cm_spring_config_src = "https://raw.githubusercontent.com/redbox-mint/curation-manager/master/grails-app/conf/spring/",
-  $cm_spring_config_resource = "resource.xml",
-  $cm_workdir = "/var/local/curationmanager/",
-  $cm_idp_1 = "asynchronousSchedule.properties",
-  $cm_idp_2 = "handleIdentityProviderConf.properties",
-  $cm_idp_3= "localIdentityProviderConf.properties",
-  $cm_idp_4 = "nlaIdentityProviderConf.properties",
-  $cm_idp_5 = "orcIdentityProviderConf.properties",
-  $hm_war_url="http://dev.redboxresearchdata.com.au/nexus/service/local/artifact/maven/redirect?r=snapshots&g=au.com.redboxresearchdata&a=json-harvester-manager&v=LATEST&e=war",
-  $cm_war_url="http://dev.redboxresearchdata.com.au/nexus/service/local/artifact/maven/redirect?r=snapshots&g=au.com.redboxresearchdata&a=CurationManager&v=LATEST&e=war",
-  $oaiserver_war_url="http://dev.redboxresearchdata.com.au/nexus/service/local/artifact/maven/redirect?r=snapshots&g=au.com.redboxresearchdata.oai&a=oai-server&v=LATEST&e=war",
-  $hm_workdir=".json-harvester-manager-production",
-  $oaiserver_workdir=".oai-server",
-  $wget_cmd = "wget -N",
-  $wget_download_cmd = "wget -N -O ",
-  $cm_handler_key_url="https://github.com/redbox-mint/curation-manager/raw/master/web-app/WEB-INF/conf/spring/handle/admpriv.bin",
-  $oaiharvester_package="redbox-oaipmh-feed.zip",
-  $oaiharvester_package_url="http://dev.redboxresearchdata.com.au/nexus/service/local/artifact/maven/redirect?r=snapshots&g=au.com.redboxresearchdata.oai&a=redbox-oai-feed&v=LATEST&e=zip&c=bin",
-  $oaiharvester_id="redbox-oai-pmh-feed",
-  $mintcsvharvester_package="mint-csvjdbc-harvester.zip",
-  $mintcsvharvester_package_url="http://dev.redboxresearchdata.com.au/nexus/service/local/artifact/maven/redirect?r=snapshots&g=au.com.redboxresearchdata&a=mint-csvjdbc-harvester&v=LATEST&e=zip&c=bin",
-  $mintcsvharvester_id="mint-csvjdbc",
-  $hm_url="http://localhost:8080/json-harvester-manager/harvester/",
-  $oaiharvester_samplehelper = "https://raw.githubusercontent.com/redbox-harvester/redbox-oai-feed/master/support/install/addSampleRecord.groovy",
-  $oaiserver_formats_url = "http://localhost/oai-server/?verb=ListMetadataFormats",
-  $groovy_version="2.2.2",
-  $groovy_install_url="http://dl.bintray.com/groovy/maven/groovy-binary-",
-  $groovy_install_dir="/opt/groovy",
-  $logRotateConf = "tomcatLogRotate",
-  $isReadyScript = "isready.sh",
-  $timestamp = generate('/bin/date', '+%Y-%m-%d_%H-%M-%S')
+  $harvester_install_dir = hiera(h_install_dir, $title),
+  $pgsql_version = hiera(h_postgres_version, "9.2"),
+  $tomcat_install = hiera(h_tomcat_install, "/opt/tomcat7"),
+  $tomcat_package_url = hiera(h_tomcat_package_url, "http://dev.redboxresearchdata.com.au/jdk/"),
+  $tomcat_package = hiera(h_tomcat_package, "apache-tomcat-7.0.22.tar.gz"),
+  $tomcat_package_dir = hiera(h_tomcat_package_dir, "apache-tomcat-7.0.22"),
+  $oaiserver_config_src = hiera(h_oaiserver_config_src, "https://raw.githubusercontent.com/redbox-mint/oai-server/master/support/install/"),
+  $oaiserver_init_sql = hiera(h_oaiserver_init_sql, "init.sql"),
+  $cm_spring_idp_config_src = hiera(h_cm_spring_idp_config_src, "https://raw.githubusercontent.com/redbox-mint/curation-manager/master/web-app/WEB-INF/conf/spring/identityProdiverServiceProperties/"),
+  $cm_spring_config_src = hiera(h_cm_spring_config_src , "https://raw.githubusercontent.com/redbox-mint/curation-manager/master/grails-app/conf/spring/"),
+  $cm_spring_config_resource = hiera(h_cm_spring_config_resource, "resource.xml"),
+  $cm_workdir = hiera(h_cm_workdir, "/var/local/curationmanager/"),
+  $cm_idp_1 = hiera(h_cm_idp_1, "asynchronousSchedule.properties"),
+  $cm_idp_2 = hiera(h_cm_idp_2, "handleIdentityProviderConf.properties"),
+  $cm_idp_3= hiera(h_cm_idp_3, "localIdentityProviderConf.properties"),
+  $cm_idp_4 = hiera(h_cm_idp_4, "nlaIdentityProviderConf.properties"),
+  $cm_idp_5 = hiera(h_cm_idp_5, "orcIdentityProviderConf.properties"),
+  $hm_war_url = hiera(h_hm_war_url, "http://dev.redboxresearchdata.com.au/nexus/service/local/artifact/maven/redirect?r=snapshots&g=au.com.redboxresearchdata&a=json-harvester-manager&v=LATEST&e=war"),
+  $cm_war_url = hiera(h_cm_war_url, "http://dev.redboxresearchdata.com.au/nexus/service/local/artifact/maven/redirect?r=snapshots&g=au.com.redboxresearchdata&a=CurationManager&v=LATEST&e=war"),
+  $oaiserver_war_url = hiera(h_oaiserver_war_url, "http://dev.redboxresearchdata.com.au/nexus/service/local/artifact/maven/redirect?r=snapshots&g=au.com.redboxresearchdata.oai&a=oai-server&v=LATEST&e=war"),
+  $hm_workdir=hiera(h_hm_workdir, ".json-harvester-manager-production"),
+  $oaiserver_workdir=hiera(h_oaiserver_workdir, ".oai-server"),
+  $wget_cmd = hiera(h_wget_cmd, "wget -N"),
+  $wget_download_cmd = hiera(h_wget_download_cmd, "wget -N -O "),
+  $cm_handler_key_url=hiera(h_cm_handler_key_url, "https://github.com/redbox-mint/curation-manager/raw/master/web-app/WEB-INF/conf/spring/handle/admpriv.bin"),
+  $oaiharvester_package=hiera(h_oaiharvester_package, "redbox-oaipmh-feed.zip"),
+  $oaiharvester_package_url=hiera(h_oaiharvester_package_url, "http://dev.redboxresearchdata.com.au/nexus/service/local/artifact/maven/redirect?r=snapshots&g=au.com.redboxresearchdata.oai&a=redbox-oai-feed&v=LATEST&e=zip&c=bin"),
+  $oaiharvester_id=hiera(h_oaiharvester_id, "redbox-oai-pmh-feed"),
+  $mintcsvharvester_package=hiera(h_mintcsvharvester_package, "mint-csvjdbc-harvester.zip"),
+  $mintcsvharvester_package_url=hiera(h_mintcsvharvester_package_url, "http://dev.redboxresearchdata.com.au/nexus/service/local/artifact/maven/redirect?r=snapshots&g=au.com.redboxresearchdata&a=mint-csvjdbc-harvester&v=LATEST&e=zip&c=bin"),
+  $mintcsvharvester_id=hiera(h_mintcsvharvester_id, "mint-csvjdbc"),
+  $hm_url=hiera(h_hm_url, "http://localhost:8080/json-harvester-manager/harvester/"),
+  $oaiharvester_samplehelper = hiera(h_oaiharvester_samplehelper, "https://raw.githubusercontent.com/redbox-harvester/redbox-oai-feed/master/support/install/addSampleRecord.groovy"),
+  $oaiserver_formats_url = hiera(h_oaiserver_formats_url, "http://localhost/oai-server/?verb=ListMetadataFormats"),
+  $groovy_version=hiera(h_groovy_version, "2.2.2"),
+  $groovy_install_url=hiera(h_groovy_install_url, "http://dl.bintray.com/groovy/maven/groovy-binary-"),
+  $groovy_install_dir=hiera(h_groovy_install_dir, "/opt/groovy"),
+  $logRotateConf = hiera(h_logRotateConf, "tomcatLogRotate"),
+  $isReadyScript = hiera(h_isReadyScript, "isready.sh"),
+  $timestamp = generate('/bin/date', '+%Y-%m-%d_%H-%M-%S'),
+  $mintHarvesterUser = hiera(h_mintHarvesterUser, "mintHarvest"),
+  $mintHarvesterSshKey = hiera(h_mintHarvesterSshKey, undef),
   ) {
   ## Install Postgres
   class { 'postgresql::globals':
@@ -123,7 +125,7 @@ define puppet-redbox::add_harvesters_complete (
       owner => "tomcat",
   } -> file {"${harvester_install_dir}${hm_workdir}":
     ensure  => directory,
-    owner   => "tomcat"
+    owner   => "tomcat",
   } -> file {"${harvester_install_dir}${oaiserver_workdir}":
     ensure  => directory,
     owner   => "tomcat"
@@ -140,15 +142,23 @@ define puppet-redbox::add_harvesters_complete (
     cwd     => "${tomcat_install}/webapps/",
     command => "${wget_download_cmd} json-harvester-manager.war '${hm_war_url}' && ${wget_download_cmd} CurationManager.war '${cm_war_url}' && ${wget_download_cmd} oai-server.war '${oaiserver_war_url}'",
     path    => ['/usr/bin','/usr/sbin', '/bin', '/sbin'],
+    unless  => "ls -l ${tomcat_install}/webapps/json-harvester-manager",
   } -> exec {"Download the config files":
     cwd     => "${cm_workdir}",
     command => "${wget_cmd} '${cm_spring_idp_config_src}${cm_idp_1}' && ${wget_cmd} '${cm_spring_idp_config_src}${cm_idp_2}' && ${wget_cmd} '${cm_spring_idp_config_src}${cm_idp_3}' && ${wget_cmd} '${cm_spring_idp_config_src}${cm_idp_4}' && ${wget_cmd} '${cm_spring_idp_config_src}${cm_idp_5}' && ${wget_cmd} '${$cm_spring_config_src}${cm_spring_config_resource}' && ${wget_cmd} '${cm_handler_key_url}'",
     path    => ['/usr/bin','/usr/sbin', '/bin', '/sbin'],
+    unless  => "ls -l ${tomcat_install}/webapps/json-harvester-manager",
   } -> exec {"Download and apply SQL init file":
     cwd     => '/tmp',
     command => "${wget_cmd} ${oaiserver_config_src}${oaiserver_init_sql} && psql -U oaiserver < ${oaiserver_init_sql}",
     path    => ['/usr/bin','/usr/sbin', '/bin'],
-  }-> exec { "Move out current Tomcat catalina.out":
+    unless  => "ls -l ${tomcat_install}/webapps/oai-server",
+  } -> exec { "Wait for Tomcat to die.":
+    cwd   => "${harvester_install_dir}",
+    command => "./${isReadyScript} '${tomcat_install}/logs/catalina.out' 'Tomcat' 'Destroying ProtocolHandler'",
+    path    => ['/usr/bin','/usr/sbin', '/bin', "${harvester_install_dir}"],
+    onlyif  => "ls -l ${tomcat_install}/logs/catalina.out",
+  } -> exec { "Move out current Tomcat catalina.out":
     cwd   => "${tomcat_install}/logs",
     command => "mv catalina.out catalina_${timestamp}",
     path    => ['/usr/bin','/usr/sbin', '/bin'],
@@ -201,7 +211,69 @@ define puppet-redbox::add_harvesters_complete (
     cwd     => "/opt/harvester",
     command => "curl --retry 2 --retry-delay 60 ${$oaiserver_formats_url}",
     path    => ['/usr/bin','/usr/sbin', '/bin'],
+  } -> file {"${harvester_install_dir}${hm_workdir}/harvest/${mintcsvharvester_id}/input":
+    ensure  => directory,
+    owner   => "tomcat",
+    mode    => 0775,
+    recurse => true,
+  } -> file {"${harvester_install_dir}${hm_workdir}/harvest/${mintcsvharvester_id}/output":
+    ensure  => directory,
+    owner   => "tomcat",
+    mode    => 0775,
+    recurse => true,
+  } -> file {"/home/${mintHarvesterUser}/input":
+    ensure  => link,
+    target  => "${harvester_install_dir}${hm_workdir}/harvest/${mintcsvharvester_id}/input",  
+    require => User["${mintHarvesterUser}"]
   }
   
+  
+  if ($mintHarvesterSshKey == undef) {
+     user {"Creating user '${mintHarvesterUser}'":
+		      name    => "${mintHarvesterUser}",
+		      ensure  => present,
+		      groups  => ["tomcat"],
+		  } -> file {"/home/${mintHarvesterUser}/":
+		       ensure  => directory,
+		       owner => "${mintHarvesterUser}",
+		       group => "${mintHarvesterUser}",
+		       mode  => 0700
+		  } -> file {"/home/${mintHarvesterUser}/.ssh ":
+		       ensure  => directory,
+		       owner => "${mintHarvesterUser}",
+		       group => "${mintHarvesterUser}",
+		       mode  => 0700
+		  } ->
+     exec {"Use public SSH key used in instance creation for user '${mintHarvesterUser}'":
+      command => "cp -R /home/ec2-user/.ssh/authorized_keys /home/${mintHarvesterUser}/.ssh/authorized_keys && chown -R ${mintHarvesterUser}:${mintHarvesterUser} /home/${mintHarvesterUser}/.ssh && chmod -R go-rwx /home/${mintHarvesterUser}/.ssh",
+      path    => ['/usr/bin','/usr/sbin', '/bin'],
+      unless  => "ls /home/${mintHarvesterUser}/.ssh",
+      require => User["Creating user '${mintHarvesterUser}'"]
+    }
+  } else {
+      user {"Creating user '${mintHarvesterUser}'":
+		      name    => "${mintHarvesterUser}",
+		      ensure  => present,
+		      groups  => ["tomcat"],
+		  } -> file {"/home/${mintHarvesterUser}/":
+		       ensure  => directory,
+		       owner => "${mintHarvesterUser}",
+		       group => "${mintHarvesterUser}",
+		       mode  => 0700
+		  } -> file {"/home/${mintHarvesterUser}/.ssh ":
+		       ensure  => directory,
+		       owner => "${mintHarvesterUser}",
+		       group => "${mintHarvesterUser}",
+		       mode  => 0700
+		  } ->
+     ssh_authorized_key {"Injecting Public SSH Key for user '${mintHarvesterUser}'":
+         name   => "${mintHarvesterUser}",
+         ensure => present,
+         key    => "${mintHarvesterSshKey}",
+         user   => "${$mintHarvesterUser}",
+         require  => User["Creating user '${mintHarvesterUser}'"],
+         type => ssh-rsa
+     }  
+  }
   include postgresql::server
 }
