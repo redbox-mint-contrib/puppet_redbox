@@ -190,6 +190,20 @@ define puppet-redbox::add_harvesters_complete (
     cwd     => "/tmp",
     command => "curl -o ${mintcsvharvester_id}_harvester.check -i -H 'Accept: application/json' '${hm_url}start/${mintcsvharvester_id}'",
     path    => ['/usr/bin','/usr/sbin', '/bin', '/sbin']
+  } -> file {"${harvester_install_dir}${hm_workdir}/harvest/${mintcsvharvester_id}/input":
+    ensure  => directory,
+    owner   => "tomcat",
+    mode    => 0775,
+    recurse => true,
+  } -> file {"${harvester_install_dir}${hm_workdir}/harvest/${mintcsvharvester_id}/output":
+    ensure  => directory,
+    owner   => "tomcat",
+    mode    => 0775,
+    recurse => true,
+  } -> file {"/home/${mintHarvesterUser}/input":
+    ensure  => link,
+    target  => "${harvester_install_dir}${hm_workdir}/harvest/${mintcsvharvester_id}/input",  
+    require => User["${mintHarvesterUser}"]
   } -> package {"Install unzip":
       name  => "unzip",
   } -> exec {"Downloading groovy...":
@@ -205,20 +219,6 @@ define puppet-redbox::add_harvesters_complete (
     cwd     => "/opt/harvester",
     command => "curl --retry 2 --retry-delay 60 ${$oaiserver_formats_url}",
     path    => ['/usr/bin','/usr/sbin', '/bin'],
-  } -> file {"${harvester_install_dir}${hm_workdir}/harvest/${mintcsvharvester_id}/input":
-    ensure  => directory,
-    owner   => "tomcat",
-    mode    => 0775,
-    recurse => true,
-  } -> file {"${harvester_install_dir}${hm_workdir}/harvest/${mintcsvharvester_id}/output":
-    ensure  => directory,
-    owner   => "tomcat",
-    mode    => 0775,
-    recurse => true,
-  } -> file {"/home/${mintHarvesterUser}/input":
-    ensure  => link,
-    target  => "${harvester_install_dir}${hm_workdir}/harvest/${mintcsvharvester_id}/input",  
-    require => User["${mintHarvesterUser}"]
   }
   
   
@@ -232,12 +232,10 @@ define puppet-redbox::add_harvesters_complete (
 		  } -> user {"Creating user '${mintHarvesterUser}'":
 		      name    => "${mintHarvesterUser}",
 		      ensure  => present,
-		      groups  => ["${mintHarvesterUser}"],
 		      gid     => "tomcat",
 		  } -> file {"/home/${mintHarvesterUser}/":
 		       ensure  => directory,
 		       owner => "${mintHarvesterUser}",
-		       group => "${mintHarvesterUser}",
 		       mode  => 0700
 		  } -> file {"/home/${mintHarvesterUser}/.profile":
            ensure  => file,
@@ -246,10 +244,9 @@ define puppet-redbox::add_harvesters_complete (
       } -> file {"/home/${mintHarvesterUser}/.ssh":
 		       ensure  => directory,
 		       owner => "${mintHarvesterUser}",
-		       group => "${mintHarvesterUser}",
 		       mode  => 0700
 		  } -> exec {"Use public SSH key used in instance creation for user '${mintHarvesterUser}'":
-		      command => "cp -R /home/ec2-user/.ssh/authorized_keys /home/${mintHarvesterUser}/.ssh/authorized_keys && chown -R ${mintHarvesterUser}:${mintHarvesterUser} /home/${mintHarvesterUser}/.ssh && chmod -R go-rwx /home/${mintHarvesterUser}/.ssh",
+		      command => "cp -R /home/ec2-user/.ssh/authorized_keys /home/${mintHarvesterUser}/.ssh/authorized_keys && chown -R ${mintHarvesterUser} /home/${mintHarvesterUser}/.ssh && chmod -R go-rwx /home/${mintHarvesterUser}/.ssh",
 		      path    => ['/usr/bin','/usr/sbin', '/bin'],
 		      unless  => "ls /home/${mintHarvesterUser}/.ssh",
 	    }
@@ -263,12 +260,10 @@ define puppet-redbox::add_harvesters_complete (
       } -> user {"Creating user '${mintHarvesterUser}'":
 		      name    => "${mintHarvesterUser}",
 		      ensure  => present,
-		      groups  => ["${mintHarvesterUser}"],
 		      gid     => "tomcat",
 		  } -> file {"/home/${mintHarvesterUser}/":
 		       ensure  => directory,
 		       owner => "${mintHarvesterUser}",
-		       group => "${mintHarvesterUser}",
 		       mode  => 0700
 		  } -> file {"/home/${mintHarvesterUser}/.profile":
            ensure  => file,
@@ -277,7 +272,6 @@ define puppet-redbox::add_harvesters_complete (
       } -> file {"/home/${mintHarvesterUser}/.ssh":
 		       ensure  => directory,
 		       owner => "${mintHarvesterUser}",
-		       group => "${mintHarvesterUser}",
 		       mode  => 0700
 		  } -> ssh_authorized_key {"Injecting Public SSH Key for user '${mintHarvesterUser}'":
 	         name   => "${mintHarvesterUser}",
