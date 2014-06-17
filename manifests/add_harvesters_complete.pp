@@ -232,13 +232,18 @@ define puppet-redbox::add_harvesters_complete (
 		  } -> user {"Creating user '${mintHarvesterUser}'":
 		      name    => "${mintHarvesterUser}",
 		      ensure  => present,
-		      groups  => ["tomcat"],
+		      groups  => ["${mintHarvesterUser}"],
+		      gid     => "tomcat",
 		  } -> file {"/home/${mintHarvesterUser}/":
 		       ensure  => directory,
 		       owner => "${mintHarvesterUser}",
 		       group => "${mintHarvesterUser}",
 		       mode  => 0700
-		  } -> file {"/home/${mintHarvesterUser}/.ssh":
+		  } -> file {"/home/${mintHarvesterUser}/.profile":
+           ensure  => file,
+           owner   => "${mintHarvesterUser}",
+           content => "umask 002",
+      } -> file {"/home/${mintHarvesterUser}/.ssh":
 		       ensure  => directory,
 		       owner => "${mintHarvesterUser}",
 		       group => "${mintHarvesterUser}",
@@ -258,13 +263,18 @@ define puppet-redbox::add_harvesters_complete (
       } -> user {"Creating user '${mintHarvesterUser}'":
 		      name    => "${mintHarvesterUser}",
 		      ensure  => present,
-		      groups  => ["tomcat"],
+		      groups  => ["${mintHarvesterUser}"],
+		      gid     => "tomcat",
 		  } -> file {"/home/${mintHarvesterUser}/":
 		       ensure  => directory,
 		       owner => "${mintHarvesterUser}",
 		       group => "${mintHarvesterUser}",
 		       mode  => 0700
-		  } -> file {"/home/${mintHarvesterUser}/.ssh":
+		  } -> file {"/home/${mintHarvesterUser}/.profile":
+           ensure  => file,
+           owner   => "${mintHarvesterUser}",
+           content => "umask 002",
+      } -> file {"/home/${mintHarvesterUser}/.ssh":
 		       ensure  => directory,
 		       owner => "${mintHarvesterUser}",
 		       group => "${mintHarvesterUser}",
