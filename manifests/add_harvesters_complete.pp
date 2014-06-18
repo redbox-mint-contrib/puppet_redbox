@@ -193,11 +193,13 @@ define puppet-redbox::add_harvesters_complete (
   } -> file {"${harvester_install_dir}${hm_workdir}/harvest/${mintcsvharvester_id}/input":
     ensure  => directory,
     owner   => "tomcat",
+    group   => "tomcat",
     mode    => 0775,
     recurse => true,
   } -> file {"${harvester_install_dir}${hm_workdir}/harvest/${mintcsvharvester_id}/output":
     ensure  => directory,
     owner   => "tomcat",
+    group   => "tomcat",
     mode    => 0775,
     recurse => true,
   } -> file {"/home/${mintHarvesterUser}/input":
