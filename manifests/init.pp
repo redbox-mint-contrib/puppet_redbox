@@ -159,7 +159,7 @@ class puppet-redbox (
 	    owner                    => $redbox_user,
 	  }
 	
-	  puppet-redbox::add_yum_repo { $yum_repos: } ->
+	  puppet-common::add_yum_repo { $yum_repos: } ->
 	  puppet-redbox::add_redbox_package { [values($packages)]:
 	    owner                    => $redbox_user,
 	    install_parent_directory => $install_parent_directory,
