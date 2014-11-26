@@ -20,6 +20,8 @@ puppet module install --version 1.0.1 puppetlabs/apache
 
 # Pull down ReDBox Puppet configuration
 yum -y install git && git clone https://github.com/redbox-mint-contrib/puppet-redbox.git /tmp/puppet-redbox && rm -Rf /tmp/puppet-redbox/.git*
+# Pull down ReDBox Puppet common
+git clone https://github.com/redbox-mint-contrib/puppet_common.git /usr/share/puppet/modules/puppet_common
 
 # Double check if we have the Puppet configuration
 echo "checking puppet-redbox cloned/copied to /tmp"
