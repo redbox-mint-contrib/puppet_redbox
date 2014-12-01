@@ -64,3 +64,12 @@ fi
 
 # Install ReDBox
 puppet apply -e "class {'puppet-redbox': install_type=>'$INSTALL_TYPE'}"
+
+# ReDBox admin is part of the default install
+git clone https://github.com/redbox-mint-contrib/puppet_redbox_admin.git /usr/share/puppet/modules/puppet_redbox_admin
+wget -O /etc/yum.repos.d/elasticsearch.repo https://raw.githubusercontent.com/redbox-mint-contrib/puppet_redbox_admin/master/support/elasticsearch.repo
+chown -R redbox:redbox /tmp/redbox
+puppet module install elasticsearch-elasticsearch --version 0.4.0
+puppet module install elasticsearch-logstash --version 0.5.1
+puppet module install maestrodev-wget --version 1.5.6
+puppet apply -e "class {'puppet_redbox_admin':}"
