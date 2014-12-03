@@ -72,4 +72,6 @@ chown -R redbox:redbox /tmp/redbox
 puppet module install elasticsearch-elasticsearch --version 0.4.0
 puppet module install elasticsearch-logstash --version 0.5.1
 puppet module install maestrodev-wget --version 1.5.6
-puppet apply -e "class {'puppet_redbox_admin':}"
+ES_CLUSTER_ID="es-cluster-`hostname`"
+ES_NODE_ID="es-node-`hostname`"
+puppet apply -e "class {'puppet_redbox_admin':clusterid=>'$ES_CLUSTER_ID', nodeid=>'$ES_NODE_ID'}"
