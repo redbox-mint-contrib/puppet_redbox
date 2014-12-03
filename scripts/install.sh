@@ -74,4 +74,4 @@ puppet module install elasticsearch-logstash --version 0.5.1
 puppet module install maestrodev-wget --version 1.5.6
 ES_CLUSTER_ID="es-cluster-`hostname`"
 ES_NODE_ID="es-node-`hostname`"
-puppet apply -e "class {'puppet_redbox_admin::logstash_elasticsearch': clusterid=>'$ES_CLUSTER_ID', nodeid=>'$ES_NODE_ID'}"
+puppet apply -e "class {'puppet_redbox_admin': es_clusterid=>'$ES_CLUSTER_ID', es_nodeid=>'$ES_NODE_ID'}"
