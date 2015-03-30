@@ -206,8 +206,6 @@ define puppet-redbox::add_harvesters_complete (
     ensure  => link,
     target  => "${harvester_install_dir}${hm_workdir}/harvest/${mintcsvharvester_id}/input",  
     require => User["${mintHarvesterUser}"]
-  } -> package {"Install unzip":
-      name  => "unzip",
   } -> exec {"Downloading groovy...":
     cwd     => "/tmp",
     command => "${wget_download_cmd} groovy-binary-${groovy_version}.zip ${groovy_install_url}${groovy_version}.zip && unzip groovy-binary-${groovy_version}.zip && mv /tmp/groovy-${groovy_version} ${groovy_install_dir} && ln -s ${groovy_install_dir}/bin/groovy /usr/bin/groovy",

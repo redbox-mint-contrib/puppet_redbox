@@ -56,6 +56,8 @@ class puppet-redbox (
       system             => 'mint',
       package            => 'mint-distro',
       server_url_context => 'mint',
+      pre_install        => 'unzip',
+      post_install       => 'mint-solr-geonames',
     }
   }
   ),

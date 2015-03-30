@@ -17,7 +17,19 @@ define puppet-redbox::add_redbox_package (
   $redbox_package = $packages[package]
   $redbox_system = $packages[system]
 
-  package { $redbox_package: }
+  if $packages[system] == 'mint' {
+    # check if there are dependencies/chains
+    if ($packages[pre_install]) {
+      package {$packages[pre_install]:
+      }
+    }
+    package{$redbox_package:}
+    if ($packages[post_install]) {
+      package {$packages[post_install]:}
+    }
+  } else {
+    package { $redbox_package: }
+  }
 
   puppet-redbox::update_system_config { "${install_parent_directory}/${redbox_system}/home/system-config.json":
     system_config => $system_config,
