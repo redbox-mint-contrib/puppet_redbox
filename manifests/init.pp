@@ -57,7 +57,7 @@ class puppet-redbox (
       package            => 'mint-distro',
       server_url_context => 'mint',
       pre_install        => 'unzip',
-      post_install       => 'mint-solr-geonames',
+      post_install       => ['mint-solr-geonames','mint-build-distro-initial-data'],
     }
   }
   ),
@@ -114,7 +114,7 @@ class puppet-redbox (
   $crontab                  = hiera_array(crontab, undef),
   $tf_env                   = hiera_hash(tf_env, undef),
   $system_config            = hiera_hash(system_config, undef)) {
-    
+
 	  if ($has_dns and $::fqdn) {
 	    $server_url = $::fqdn
 	  } elsif ($::ipaddress) {
@@ -122,21 +122,21 @@ class puppet-redbox (
 	  } else {
 	    $server_url = $::ipaddress_lo
 	  }
-	
+
 	  host { [$::fqdn, $::hostname]: ip => $::ipaddress, }
-	
+
 	  Exec {
 	    path      => $exec_path,
 	    logoutput => false,
 	  }
-	
+
 	  puppet-redbox::add_systemuser { $redbox_user: } ->
 	  add_directory { $directories:
 	    owner            => $redbox_user,
 	    parent_directory => $install_parent_directory,
 	  } ->
 	  class { 'puppet-redbox::java': }
-	
+
 	  if ($proxy) {
 	    class { 'puppet-redbox::add_proxy_server':
 	      require    => Class['Puppet-redbox::Java'],
@@ -146,12 +146,12 @@ class puppet-redbox (
 	      ssl_config => $ssl_config,
 	      proxy      => $proxy,
 	    } ~> Service['httpd']
-	
+
 	    Class['Puppet-redbox::Deploy_script'] ~> Service['httpd']
 	    Puppet-redbox::Add_redbox_package[values($packages)] ~> Service['httpd']
-	
+
 	  }
-	
+
 	  class { 'puppet-redbox::deploy_script':
 	    archives                 => $archives,
 	    has_ssl                  => $has_ssl,
@@ -160,7 +160,7 @@ class puppet-redbox (
 	    deploy_parent_directory  => $deploy_parent_directory,
 	    owner                    => $redbox_user,
 	  }
-	
+
 	  puppet_common::add_yum_repo { $yum_repos: } ->
 	  puppet-redbox::add_redbox_package { [values($packages)]:
 	    owner                    => $redbox_user,
@@ -170,7 +170,7 @@ class puppet-redbox (
 	    system_config            => $system_config,
 	    base_server_url          => $server_url,
 	  }
-	
+
 	  if ($crontab) {
 	    puppet-redbox::add_cron { $crontab: }
 	  }
