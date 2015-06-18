@@ -43,7 +43,7 @@ define puppet-redbox::add_redbox_package (
       subscribe     => Package[$redbox_package],
     }
 
-    if ($system_config[api]) {
+    if ($system_config and $system_config[api]) {
       file_line { 'update system-config.json api key':
         path      => "${packages[install_directory]}/home/config-include/2-misc-modules/apiSecurity.json",
         line      => "\"apiKey\": \"${system_config[api][clients][apiKey]}\",",
