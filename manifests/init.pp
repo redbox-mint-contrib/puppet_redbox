@@ -25,6 +25,7 @@
 #   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #
 class puppet-redbox (
+  $install_type             = 'basic',
   $redbox_user              = hiera(redbox_user, 'redbox'),
   $install_parent_directory = hiera(install_parent_directory, '/opt'),
   $packages                 = hiera_hash(packages, {
