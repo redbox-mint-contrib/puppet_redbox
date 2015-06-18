@@ -88,13 +88,25 @@ class puppet-redbox (
     }
   }
   ),
-  $yum_repos                = hiera(yum_repos, [{
-      name     => 'redbox',
-      descr    => 'Redbox_repo',
+  $yum_repos                = hiera(yum_repos, [
+    {
+      name     => 'redbox_releases',
+      descr    => 'Redbox_release_repo',
       baseurl  => 'http://dev.redboxresearchdata.com.au/yum/releases',
       gpgcheck => 0,
+      priority => 1,
       enabled  => 1
     }
+    ,
+    {
+      name     => 'redbox_snapshots',
+      descr    => 'Redbox_snapshot_repo',
+      baseurl  => 'http://dev.redboxresearchdata.com.au/yum/snapshots',
+      gpgcheck => 0,
+      priority => 20,
+      enabled  => 1
+    }
+
     ]),
   $crontab                  = hiera_hash(crontab, undef),
   $tf_env                   = hiera_hash(tf_env, undef),
