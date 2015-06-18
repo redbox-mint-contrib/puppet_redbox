@@ -19,6 +19,7 @@ puppet module install --force --version 4.3.2 puppetlabs/stdlib
 puppet module install --force --version 1.1.1 puppetlabs/apache
 
 
+## placed here instead of puppet as temp workaround
 yum install -y yum-priorities
 
 # Pull down ReDBox Puppet configuration
