@@ -5,7 +5,7 @@ define puppet-redbox::update_system_config (
   if ($system_config) {
     $load_path = "${root_path}/lib/augeas/lenses"
 
-    package { 'augeas': ensure => installed, }
+    ensure_packages('augeas')
 
     if ($system_config[rapidAafSso]) {
       augeas { "${system_config_path}_rapid":
@@ -13,9 +13,12 @@ define puppet-redbox::update_system_config (
         incl      => $system_config_path,
         lens      => 'Custom_json.lns',
         changes   => [
-          "set dict/entry[. = 'rapidAafSso']/dict/entry[. = 'iss']/string \"${system_config[rapidAafSso][iss]}\"",
-          "set dict/entry[. = 'rapidAafSso']/dict/entry[. = 'url']/string \"${system_config[rapidAafSso][url]}\"",
-          "set dict/entry[. = 'rapidAafSso']/dict/entry[. = 'sharedKey']/string \"${system_config[rapidAafSso][sharedKey]}\""],
+          "set dict/entry[. = 'rapidAafSso']/dict/entry[. = 'iss']/string \"${system_config[
+              rapidAafSso][iss]}\"",
+          "set dict/entry[. = 'rapidAafSso']/dict/entry[. = 'url']/string \"${system_config[
+              rapidAafSso][url]}\"",
+          "set dict/entry[. = 'rapidAafSso']/dict/entry[. = 'sharedKey']/string \"${system_config[
+              rapidAafSso][sharedKey]}\""],
         require   => Package['augeas'],
       }
     }
