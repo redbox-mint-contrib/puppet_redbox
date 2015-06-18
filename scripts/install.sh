@@ -15,8 +15,8 @@ yum install -y puppet
 
 # Install Basic Puppet Modules
 puppet module install --version 1.0.2 puppetlabs/concat
-puppet module install --version 4.1.0 puppetlabs/stdlib
-puppet module install --version 1.0.1 puppetlabs/apache
+puppet module install --version 4.3.2 puppetlabs/stdlib
+puppet module install --version 1.1.1 puppetlabs/apache
 
 # Pull down ReDBox Puppet configuration
 yum -y install git && git clone https://github.com/redbox-mint-contrib/puppet-redbox.git /tmp/puppet-redbox && rm -Rf /tmp/puppet-redbox/.git*
