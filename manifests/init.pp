@@ -94,7 +94,7 @@ class puppet-redbox (
       descr    => 'Redbox_release_repo',
       baseurl  => 'http://dev.redboxresearchdata.com.au/yum/releases',
       gpgcheck => 0,
-      priority => 1,
+      priority => 15,
       enabled  => 1
     }
     ,
