@@ -32,7 +32,7 @@ class puppet-redbox (
       system             => 'redbox',
       package            => 'redbox-distro',
       server_url_context => 'redbox',
-      install_directory => '/opt/redbox',
+      install_directory  => '/opt/redbox',
     }
     ,
     mint               => {
@@ -41,7 +41,9 @@ class puppet-redbox (
       server_url_context => 'mint',
       install_directory  => '/opt/mint',
       pre_install        => 'unzip',
-      post_install       => ['mint-solr-geonames', 'mint-build-distro-initial-data'],
+      post_install       => [
+        'mint-solr-geonames',
+        'mint-build-distro-initial-data'],
     }
   }
   ),
@@ -85,7 +87,7 @@ class puppet-redbox (
     }
   }
   ),
-  $yum_repos                = hiera_array(yum_repos, [{
+  $yum_repos                = hiera(yum_repos, [{
       name     => 'redbox',
       descr    => 'Redbox_repo',
       baseurl  => 'http://dev.redboxresearchdata.com.au/yum/releases',
@@ -159,7 +161,7 @@ class puppet-redbox (
   if $install_type == 'harvester-complete' {
     puppet-redbox::add_harvesters_complete { "/opt/harvester/": }
   }
-  
+
   tidy { '/var/lib/puppet/reports':
     age     => '1w',
     recurse => true,
