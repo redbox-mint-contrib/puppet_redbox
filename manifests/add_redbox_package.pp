@@ -5,7 +5,8 @@ define puppet-redbox::add_redbox_package (
   $has_ssl         = undef,
   $tf_env          = undef,
   $system_config   = undef,
-  $base_server_url = undef,) {
+  $base_server_url = undef,
+  $proxy           = undef,) {
   if ($packages[server_url_context]) {
     $server_url = "${base_server_url}/${packages[server_url_context]}"
   } else {
@@ -19,20 +20,20 @@ define puppet-redbox::add_redbox_package (
     before => Package[$redbox_package]
   }
 
-  if $redbox_system == 'mint' {
-    # check if there are dependencies/chains
-    if ($packages[pre_install]) {
-      package { $packages[pre_install]: }
+  if ($packages[pre_install]) {
+    package { $packages[pre_install]:
+      require => Puppet_common::Add_directory[$packages[install_directory]],
+      before  => Package[$redbox_package],
     }
-
-    package { $redbox_package: }
-
-    if ($packages[post_install]) {
-      package { $packages[post_install]: }
-    }
-  } else {
-    package { $redbox_package: }
   }
+
+  if ($packages[post_install]) {
+    package { $packages[post_install]: require => [
+        Puppet_common::Add_directory[$packages[install_directory]],
+        Package[$redbox_package]], }
+  }
+
+  package { $redbox_package: }
 
   if ($redbox_system == 'redbox') {
     puppet-redbox::update_system_config { [
@@ -86,10 +87,12 @@ define puppet-redbox::add_redbox_package (
   }
 
   #  mint is not always proxied
-  if ($redbox_system == 'mint') {
-    puppet-redbox::prime_system { "localhost:9001/mint": subscribe => [
+  if ($redbox_system == 'mint' and !empty(grep(join($proxy, ","), "http://localhost:9001/mint"))) {
+    puppet-redbox::prime_system { "localhost:9001/mint":
+      subscribe => [
         Exec["$redbox_system-restart_on_refresh"],
-        Service[$redbox_system]], }
+        Service[$redbox_system]],
+    }
   } else {
     puppet-redbox::prime_system { $server_url: subscribe => [
         Exec["$redbox_system-restart_on_refresh"],
