@@ -152,7 +152,7 @@ class puppet-redbox (
       proxy      => $proxy,
     } ~> Service['httpd']
 
-    Puppet-redbox::Add_redbox_package[values($packages)] -> Service['httpd']
+    Puppet-redbox::Add_redbox_package[values($packages)] -> exec { 'service httpd restart': }
 
   }
 
@@ -163,7 +163,8 @@ class puppet-redbox (
     tf_env          => $tf_env,
     system_config   => $system_config,
     base_server_url => $server_url,
-    require         => [Puppet_common::Add_systemuser[$redbox_user], Class['Puppet_common::Java']]
+    require         => [Puppet_common::Add_systemuser[$redbox_user], Class['Puppet_common::Java']],
+    notify          => Service['httpd']
   }
 
   if ($crontab) {
