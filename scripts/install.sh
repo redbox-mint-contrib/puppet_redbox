@@ -70,7 +70,7 @@ if [ -e /tmp/puppet-hiera-redbox/scripts/install.sh ]; then
 fi
 
 # Install ReDBox
-puppet apply -e "class {'puppet-redbox': install_type=>'$INSTALL_TYPE'} --logdest ${LOG_DEST}"
+puppet apply --logdest ${LOG_DEST} -e "class {'puppet-redbox': install_type=>'$INSTALL_TYPE'}"
 
 # ReDBox admin is part of the default install
 git clone https://github.com/redbox-mint-contrib/puppet_redbox_admin.git /usr/share/puppet/modules/puppet_redbox_admin
@@ -81,4 +81,4 @@ puppet module install elasticsearch-logstash --version 0.5.1
 puppet module install maestrodev-wget --version 1.5.6
 ES_CLUSTER_ID="es-cluster-`hostname`"
 ES_NODE_ID="es-node-`hostname`"
-puppet apply -e "class {'puppet_redbox_admin': es_clusterid=>'$ES_CLUSTER_ID', es_nodeid=>'$ES_NODE_ID'} --logdest ${LOG_DEST}"
+puppet apply --logdest ${LOG_DEST} -e "class {'puppet_redbox_admin': es_clusterid=>'$ES_CLUSTER_ID', es_nodeid=>'$ES_NODE_ID'}"
