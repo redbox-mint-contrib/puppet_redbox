@@ -152,7 +152,7 @@ class puppet-redbox (
       proxy      => $proxy,
     } ~> Service['httpd']
 
-    Puppet-redbox::Add_redbox_package[values($packages)] ~> Service['httpd']
+    Puppet-redbox::Add_redbox_package[values($packages)] -> Service['httpd']
 
   }
 
