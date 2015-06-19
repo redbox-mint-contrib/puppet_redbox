@@ -9,9 +9,12 @@ usage() {
 }
 usage
 
+export LOG_DEST=/var/log/puppet/puppet.log
+
 # Install Puppet
 rpm -ivh http://yum.puppetlabs.com/el/6/products/x86_64/puppetlabs-release-6-7.noarch.rpm
 yum install -y puppet
+touch $LOG_DEST
 
 # Install Basic Puppet Modules
 puppet module install --force --version 1.0.2 puppetlabs/concat
@@ -67,7 +70,7 @@ if [ -e /tmp/puppet-hiera-redbox/scripts/install.sh ]; then
 fi
 
 # Install ReDBox
-puppet apply -e "class {'puppet-redbox': install_type=>'$INSTALL_TYPE'}"
+puppet apply -e "class {'puppet-redbox': install_type=>'$INSTALL_TYPE'} --logdest ${LOG_DEST}"
 
 # ReDBox admin is part of the default install
 git clone https://github.com/redbox-mint-contrib/puppet_redbox_admin.git /usr/share/puppet/modules/puppet_redbox_admin
@@ -78,4 +81,4 @@ puppet module install elasticsearch-logstash --version 0.5.1
 puppet module install maestrodev-wget --version 1.5.6
 ES_CLUSTER_ID="es-cluster-`hostname`"
 ES_NODE_ID="es-node-`hostname`"
-puppet apply -e "class {'puppet_redbox_admin': es_clusterid=>'$ES_CLUSTER_ID', es_nodeid=>'$ES_NODE_ID'}"
+puppet apply -e "class {'puppet_redbox_admin': es_clusterid=>'$ES_CLUSTER_ID', es_nodeid=>'$ES_NODE_ID'} --logdest ${LOG_DEST}"
