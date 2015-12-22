@@ -3,7 +3,7 @@ require 'spec_helper'
 describe 'puppet_redbox::institutional_build::overlay' do
   let :default_params do
     {
-      :ssh_user                 => 'root',
+      :institution_ssh_user                 => 'root',
       :revision                 => 'master',
       :system_install_directory => '/opt/redbox',
       :local_repo_parent        => '/tmp'

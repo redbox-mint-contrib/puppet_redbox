@@ -147,7 +147,7 @@ class puppet_redbox (
   if ($proxy) {
     class { 'puppet_redbox::add_proxy_server':
       require    => Class['Puppet_common::Java'],
-      before     => [puppet_redbox::Add_redbox_package[values($packages)]],
+      before     => Puppet_redbox::Add_redbox_package[values($packages)],
       server_url => $server_url,
       has_ssl    => $has_ssl,
       ssl_config => $ssl_config,
