@@ -1,5 +1,5 @@
 
-define puppet-redbox::add_redbox_package (
+define puppet_redbox::add_redbox_package (
   $packages        = $title,
   $owner           = undef,
   $has_ssl         = undef,
@@ -20,10 +20,18 @@ define puppet-redbox::add_redbox_package (
     before => Package[$redbox_package]
   }
 
+  puppet_redbox::pre_upgrade_backup { $packages[install_directory]:
+    system_name => $redbox_system,
+    requires    => Puppet_common::Add_directory[$packages[install_directory]],
+    before      => Package[$redbox_package],
+  }
+
   if ($packages[pre_install]) {
     package { $packages[pre_install]:
       require => Puppet_common::Add_directory[$packages[install_directory]],
-      before  => Package[$redbox_package],
+      before  => [
+        Package[$redbox_package],
+        puppet_redbox::Pre_upgrade_backup[$packages[install_directory]]],
     }
   }
 
@@ -36,7 +44,7 @@ define puppet-redbox::add_redbox_package (
   package { $redbox_package: }
 
   if ($redbox_system == 'redbox') {
-    puppet-redbox::update_system_config { [
+    puppet_redbox::update_system_config { [
       "${packages[install_directory]}/home/config-include/2-misc-modules/rapidaaf.json",
       "${packages[install_directory]}/home/config-include/plugins/rapidaaf.json"]:
       system_config => $system_config,
@@ -60,7 +68,7 @@ define puppet-redbox::add_redbox_package (
     }
   }
 
-  puppet-redbox::update_server_env { "${packages[install_directory]}/server/tf_env.sh":
+  puppet_redbox::update_server_env { "${packages[install_directory]}/server/tf_env.sh":
     tf_env     => $tf_env,
     has_ssl    => $has_ssl,
     server_url => $server_url,
@@ -88,16 +96,16 @@ define puppet-redbox::add_redbox_package (
 
   #  mint is not always proxied
   if ($redbox_system == 'mint' and !empty(grep(join($proxy, ","), "http://localhost:9001/mint"))) {
-    puppet-redbox::prime_system { "localhost:9001/mint":
+    puppet_redbox::prime_system { "localhost:9001/mint":
       subscribe => [
         Exec["$redbox_system-restart_on_refresh"],
         Service[$redbox_system]],
     }
   } else {
-    puppet-redbox::prime_system { $server_url: subscribe => [
+    puppet_redbox::prime_system { $server_url: subscribe => [
         Exec["$redbox_system-restart_on_refresh"],
         Service[$redbox_system]], }
   }
 
-  puppet-redbox::add_tidy { $redbox_system: require => Service[$redbox_system], }
+  puppet_redbox::add_tidy { $redbox_system: require => Service[$redbox_system], }
 }

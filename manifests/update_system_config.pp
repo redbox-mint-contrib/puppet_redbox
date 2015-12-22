@@ -1,7 +1,7 @@
-define puppet-redbox::update_system_config (
+define puppet_redbox::update_system_config (
   $system_config_path = $title,
   $system_config      = undef,
-  $root_path          = get_module_path('puppet-redbox')) {
+  $root_path          = get_module_path('puppet_redbox')) {
   if ($system_config) {
     $load_path = "${root_path}/lib/augeas/lenses"
 

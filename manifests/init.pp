@@ -1,4 +1,4 @@
-# == Class: puppet-redbox
+# == Class: puppet_redbox
 #
 # Puppet Centos installation of redbox and mint, including harvester,apache proxy and system_config
 # population.
@@ -24,27 +24,29 @@
 #   with this program; if not, write to the Free Software Foundation, Inc.,
 #   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #
-class puppet-redbox (
+class puppet_redbox (
   $install_type             = 'basic',
   $redbox_user              = hiera(redbox_user, 'redbox'),
   $install_parent_directory = hiera(install_parent_directory, '/opt'),
   $packages                 = hiera_hash(packages, {
-    redbox             => {
-      system             => 'redbox',
-      package            => 'redbox-distro',
-      server_url_context => 'redbox',
-      install_directory  => '/opt/redbox',
+    redbox              => {
+      system              => 'redbox',
+      package             => 'redbox-distro',
+      server_url_context  => 'redbox',
+      install_directory   => '/opt/redbox',
+      institutional_build => undef,
     }
     ,
-    mint               => {
-      system             => 'mint',
-      package            => 'mint-distro',
-      server_url_context => 'mint',
-      install_directory  => '/opt/mint',
-      pre_install        => 'unzip',
-      post_install       => [
+    mint                => {
+      system              => 'mint',
+      package             => 'mint-distro',
+      server_url_context  => 'mint',
+      install_directory   => '/opt/mint',
+      pre_install         => 'unzip',
+      post_install        => [
         'mint-solr-geonames',
         'mint-build-distro-initial-data'],
+      institutional_build => undef,
     }
   }
   ),
@@ -143,9 +145,9 @@ class puppet-redbox (
   }
 
   if ($proxy) {
-    class { 'puppet-redbox::add_proxy_server':
+    class { 'puppet_redbox::add_proxy_server':
       require    => Class['Puppet_common::Java'],
-      before     => [Puppet-redbox::Add_redbox_package[values($packages)]],
+      before     => [puppet_redbox::Add_redbox_package[values($packages)]],
       server_url => $server_url,
       has_ssl    => $has_ssl,
       ssl_config => $ssl_config,
@@ -155,18 +157,24 @@ class puppet-redbox (
   }
 
   puppet_common::add_yum_repo { $yum_repos: exec_path => $exec_path } ->
-  puppet-redbox::add_redbox_package { [values($packages)]:
+  puppet_redbox::add_redbox_package { [values($packages)]:
     owner           => $redbox_user,
     has_ssl         => $has_ssl,
     tf_env          => $tf_env,
     system_config   => $system_config,
     base_server_url => $server_url,
-    proxy          => $proxy,
+    proxy           => $proxy,
     require         => [Puppet_common::Add_systemuser[$redbox_user], Class['Puppet_common::Java']],
+    before          => puppet_redbox::Institutional_build::Overlay[$packages[institutional_build]],
     notify          => Service['httpd']
   }
 
-  exec { 'service httpd restart': require => Puppet-redbox::Add_redbox_package[values($packages)], }
+  if ($packages[institutional_build]) {
+    puppet_redbox::institutional_build::overlay { $packages[institutional_build]: 
+      system_install_directory => $packages[install_directory], }
+  }
+
+  exec { 'service httpd restart': require => puppet_redbox::Add_redbox_package[values($packages)], }
 
   if ($crontab) {
     puppet_common::add_cron { $crontab: cron_path => join($exec_path, ":"), }
@@ -174,7 +182,7 @@ class puppet-redbox (
 
   # Check flag whether to install Harvester stack
   if $install_type == 'harvester-complete' {
-    puppet-redbox::add_harvesters_complete { "/opt/harvester/": }
+    puppet_redbox::add_harvesters_complete { "/opt/harvester/": }
   }
 
   tidy { '/var/lib/puppet/reports':

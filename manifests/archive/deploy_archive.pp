@@ -1,4 +1,4 @@
-define puppet-redbox::deploy_archive (
+define puppet_redbox::deploy_archive (
   $archive           = $title,
   $url               = 'http://dev.redboxresearchdata.com.au/nexus/service/local/artifact/maven/redirect',
   $archive_extension = 'tar.gz',
@@ -14,9 +14,9 @@ define puppet-redbox::deploy_archive (
 
   concat::fragment { "deploy_${redbox_system}_fragment":
     target  => $deploy_script_path,
-    content => template("puppet-redbox/deploy_system_fragment.sh.erb"),
+    content => template("puppet_redbox/deploy_system_fragment.sh.erb"),
     order   => '10',
   }
   
-  puppet-redbox::add_tidy { $redbox_system: }
+  puppet_redbox::add_tidy { $redbox_system: }
 }

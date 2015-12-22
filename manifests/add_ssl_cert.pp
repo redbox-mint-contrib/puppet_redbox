@@ -1,4 +1,4 @@
-define puppet-redbox::add_ssl_cert ($ssl_config = $title) {
+define puppet_redbox::add_ssl_cert ($ssl_config = $title) {
   $ssl_config_parent = dirname("${ssl_config[file]}")
   ensure_resource('file', $ssl_config_parent, {
     ensure => 'directory',

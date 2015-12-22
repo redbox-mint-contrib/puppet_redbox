@@ -1,4 +1,4 @@
-define puppet-redbox::add_tidy ($system = $title,) {
+define puppet_redbox::add_tidy ($system = $title,) {
   tidy { "/opt/${system}/home/logs":
     age     => "1m",
     recurse => true,

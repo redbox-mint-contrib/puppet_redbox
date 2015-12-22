@@ -26,20 +26,20 @@ puppet module install --force --version 1.1.1 puppetlabs/apache
 yum install -y yum-priorities
 
 # Pull down ReDBox Puppet configuration
-yum -y install git && git clone https://github.com/redbox-mint-contrib/puppet-redbox.git /tmp/puppet-redbox && rm -Rf /tmp/puppet-redbox/.git*
+yum -y install git && git clone https://github.com/redbox-mint-contrib/puppet_redbox.git /tmp/puppet_redbox && rm -Rf /tmp/puppet_redbox/.git*
 # Pull down ReDBox Puppet common
 git clone https://github.com/redbox-mint-contrib/puppet_common.git /usr/share/puppet/modules/puppet_common
 
 # Double check if we have the Puppet configuration
-echo "checking puppet-redbox cloned/copied to /tmp"
-find /tmp -maxdepth 1 -iname "puppet-redbox" || exit 1
+echo "checking puppet_redbox cloned/copied to /tmp"
+find /tmp -maxdepth 1 -iname "puppet_redbox" || exit 1
 
 echo "removing existing puppet module"
-rm -Rf /usr/share/puppet/modules/puppet-redbox
+rm -Rf /usr/share/puppet/modules/puppet_redbox
 echo "copying redbox to module path"
-cp -Rf /tmp/puppet-redbox /usr/share/puppet/modules/
+cp -Rf /tmp/puppet_redbox /usr/share/puppet/modules/
 echo "cleaning up tmp"
-rm -Rf /tmp/puppet-redbox
+rm -Rf /tmp/puppet_redbox
 
 # Check if we have to install other components, purposely injected here to make Hiera optional.
 INSTALL_TYPE="basic"
@@ -70,7 +70,7 @@ if [ -e /tmp/puppet-hiera-redbox/scripts/install.sh ]; then
 fi
 
 # Install ReDBox
-puppet apply --logdest ${LOG_DEST} -e "class {'puppet-redbox': install_type=>'$INSTALL_TYPE'}"
+puppet apply --logdest ${LOG_DEST} -e "class {'puppet_redbox': install_type=>'$INSTALL_TYPE'}"
 
 # ReDBox admin is part of the default install
 git clone https://github.com/redbox-mint-contrib/puppet_redbox_admin.git /usr/share/puppet/modules/puppet_redbox_admin

@@ -1,4 +1,4 @@
-class puppet-redbox::add_proxy_server (
+class puppet_redbox::add_proxy_server (
   $priority   = '10',
   $server_url = $::fqdn,
   $docroot    = '/var/www/html',
@@ -37,13 +37,13 @@ class puppet-redbox::add_proxy_server (
   file { 'redbox.conf':
     path    => "${conf_dir}/${priority}-redbox.conf",
     ensure  => file,
-    content => template("puppet-redbox/redbox.conf.erb"),
+    content => template("puppet_redbox/redbox.conf.erb"),
     require => Class['apache'],
   }
 
   if ($has_ssl and $ssl_config) {
     $conf_file_name = "redbox-ssl"
-    puppet-redbox::add_ssl_cert { [values($ssl_config)]: } ->
+    puppet_redbox::add_ssl_cert { [values($ssl_config)]: } ->
     apache::vhost { $conf_file_name:
       port       => '443',
       docroot    => $docroot,
