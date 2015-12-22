@@ -27,7 +27,7 @@ define puppet_redbox::institutional_build::overlay (
     user     => $institution_ssh_user,
   }
 
-  exec { "copy vcsrepo files from ${local_repo} to ${system_install_directory}":
+  exec { "copy files from ${local_repo} to ${system_install_directory}":
     command => "/usr/bin/rsync -rcvzh --filter='- .git*' --filter='- README*' ${local_repo}/* ${system_install_directory}/",
     require => Vcsrepo["clone ${git_clone_url} to ${local_repo}"],
   }
