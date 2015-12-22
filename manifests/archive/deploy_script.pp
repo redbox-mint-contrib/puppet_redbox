@@ -1,7 +1,7 @@
-class puppet_redbox::deploy_script (
+class puppet_redbox::archive::deploy_script (
   $script_name              = 'deploy.sh',
-  $new_extension            = "timestamp.new",
-  $old_extension            = "timestamp.old",
+  $new_extension            = 'timestamp.new',
+  $old_extension            = 'timestamp.old',
   $deploy_parent_directory  = undef,
   $install_parent_directory = undef,
   $owner                    = undef,
@@ -17,14 +17,14 @@ class puppet_redbox::deploy_script (
     group => $owner,
   }
 
-  concat::fragment { "deploy_main":
+  concat::fragment { 'deploy_main':
     target  => $deploy_script_path,
-    content => template("puppet_redbox/deploy_main.sh.erb"),
+    content => template('puppet_redbox/deploy_main.sh.erb'),
     order   => '01',
   }
 
-  puppet_redbox::deploy_archive { [values($archives)]: deploy_script_path => $deploy_script_path, } ->
-  exec { "$deploy_script_path":
+  puppet_redbox::deploy_archive { values($archives): deploy_script_path => $deploy_script_path, } ->
+  exec { $deploy_script_path:
     cwd       => $working_directory,
     user      => $owner,
     tries     => 3,

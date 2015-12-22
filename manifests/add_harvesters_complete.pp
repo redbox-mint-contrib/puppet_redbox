@@ -129,7 +129,7 @@ define puppet_redbox::add_harvesters_complete (
     command => "tar xzf ${tomcat_package} && mv -f ${tomcat_package_dir} ${tomcat_install} && rm -rf ${tomcat_package} && curl -o ${tomcat_install}/bin/setenv.sh ${oaiserver_config_src}setenv.sh && chmod +x ${tomcat_install}/bin/setenv.sh && chown -R tomcat:tomcat ${tomcat_install} && curl -o /etc/init.d/tomcat7 ${oaiserver_config_src}tomcat7 && chmod +x /etc/init.d/tomcat7",
     path    => ['/usr/bin', '/usr/sbin', '/bin', '/sbin'],
     unless  => "ls -l ${tomcat_install}",
-  } -> file { "${harvester_install_dir}":
+  } -> file { $harvester_install_dir:
     ensure => directory,
     owner  => 'tomcat',
   } -> file { "${harvester_install_dir}${hm_workdir}":
@@ -138,7 +138,7 @@ define puppet_redbox::add_harvesters_complete (
   } -> file { "${harvester_install_dir}${oaiserver_workdir}":
     ensure => directory,
     owner  => 'tomcat'
-  } -> file { "${cm_workdir}":
+  } -> file { $cm_workdir:
     ensure => directory,
     owner  => 'tomcat'
   } -> file { "/home/tomcat/${hm_workdir}":
@@ -153,8 +153,8 @@ define puppet_redbox::add_harvesters_complete (
     command => "${wget_download_cmd} json-harvester-manager.war '${hm_war_url}' && ${wget_download_cmd} CurationManager.war '${cm_war_url}' && ${wget_download_cmd} oai-server.war '${oaiserver_war_url}'",
     path    => ['/usr/bin', '/usr/sbin', '/bin', '/sbin'],
     unless  => "ls -l ${tomcat_install}/webapps/json-harvester-manager",
-  } -> exec { "Download the config files":
-    cwd     => "${cm_workdir}",
+  } -> exec { 'Download the config files':
+    cwd     => $cm_workdir,
     command => "${wget_cmd} '${cm_spring_idp_config_src}${cm_idp_1}' && ${wget_cmd} '${cm_spring_idp_config_src}${cm_idp_2}' && ${wget_cmd} '${cm_spring_idp_config_src}${cm_idp_3}' && ${wget_cmd} '${cm_spring_idp_config_src}${cm_idp_4}' && ${wget_cmd} '${cm_spring_idp_config_src}${cm_idp_5}' && ${wget_cmd} '${$cm_spring_config_src}${cm_spring_config_resource}' && ${wget_cmd} '${cm_handler_key_url}'",
     path    => ['/usr/bin', '/usr/sbin', '/bin', '/sbin'],
     unless  => "ls -l ${tomcat_install}/webapps/json-harvester-manager",
@@ -164,9 +164,9 @@ define puppet_redbox::add_harvesters_complete (
     path    => ['/usr/bin', '/usr/sbin', '/bin'],
     unless  => "ls -l ${tomcat_install}/webapps/oai-server",
   } -> exec { 'Wait for Tomcat to die.':
-    cwd     => "${harvester_install_dir}",
+    cwd     => $harvester_install_dir,
     command => "./${isReadyScript} '${tomcat_install}/logs/catalina.out' 'Tomcat' 'Destroying ProtocolHandler'",
-    path    => ['/usr/bin', '/usr/sbin', '/bin', "${harvester_install_dir}"],
+    path    => ['/usr/bin', '/usr/sbin', '/bin', $harvester_install_dir],
     onlyif  => "ls -l ${tomcat_install}/logs/catalina.out",
   } -> exec { 'Move out current Tomcat catalina.out':
     cwd     => "${tomcat_install}/logs",
@@ -174,19 +174,19 @@ define puppet_redbox::add_harvesters_complete (
     path    => ['/usr/bin', '/usr/sbin', '/bin'],
     onlyif  => 'ls -l catalina.out',
   } -> exec { 'Download helper script and logrotateConf':
-    cwd     => "${harvester_install_dir}",
+    cwd     => $harvester_install_dir,
     command => "${wget_cmd} ${oaiserver_config_src}${isReadyScript} && chmod +x ${isReadyScript} && ${wget_download_cmd} /etc/logrotate.d/${logRotateConf} ${oaiserver_config_src}${logRotateConf}",
     path    => ['/usr/bin', '/usr/sbin', '/bin'],
     unless  => "ls -l ${isReadyScript}",
   } -> service { 'Configure Tomcat service':
-    name       => 'tomcat7',
     ensure     => running,
+    name       => 'tomcat7',
     hasrestart => true,
     enable     => true
   } -> exec { 'Wait for Tomcat to be ready.':
-    cwd     => "${harvester_install_dir}",
+    cwd     => $harvester_install_dir,
     command => "./${isReadyScript} '${tomcat_install}/logs/catalina.out' 'Tomcat' 'Server startup'",
-    path    => ['/usr/bin', '/usr/sbin', '/bin', "${harvester_install_dir}"],
+    path    => ['/usr/bin', '/usr/sbin', '/bin', $harvester_install_dir],
     onlyif  => "ls -l ${tomcat_install}/logs/catalina.out",
   } -> exec { 'Install OAI-PMH FEED harvester':
     cwd     => '/tmp',
@@ -210,18 +210,18 @@ define puppet_redbox::add_harvesters_complete (
     ensure  => directory,
     owner   => 'tomcat',
     group   => 'tomcat',
-    mode    => 0775,
+    mode    => '0775',
     recurse => true,
   } -> file { "${harvester_install_dir}${hm_workdir}/harvest/${mintcsvharvester_id}/output":
     ensure  => directory,
     owner   => 'tomcat',
     group   => 'tomcat',
-    mode    => 0775,
+    mode    => '0775',
     recurse => true,
   } -> file { "/home/${mintHarvesterUser}/input":
     ensure  => link,
     target  => "${harvester_install_dir}${hm_workdir}/harvest/${mintcsvharvester_id}/input",
-    require => User["${mintHarvesterUser}"]
+    require => User[$mintHarvesterUser]
   } -> exec { 'Downloading groovy...':
     cwd     => '/tmp',
     command => "${wget_download_cmd} groovy-binary-${groovy_version}.zip ${groovy_install_url}${groovy_version}.zip && unzip groovy-binary-${groovy_version}.zip && mv /tmp/groovy-${groovy_version} ${groovy_install_dir} && ln -s ${groovy_install_dir}/bin/groovy /usr/bin/groovy",
@@ -239,27 +239,27 @@ define puppet_redbox::add_harvesters_complete (
 
   if ($mintHarvesterSshKey == undef) {
     user { 'Add tomcat user':
-      name   => 'tomcat',
       ensure => present,
+      name   => 'tomcat',
     } -> file { '/home/tomcat':
       ensure => directory,
       owner  => 'tomcat',
     } -> user { "Creating user '${mintHarvesterUser}'":
-      name   => "${mintHarvesterUser}",
       ensure => present,
+      name   => $mintHarvesterUser,
       gid    => 'tomcat',
     } -> file { "/home/${mintHarvesterUser}/":
       ensure => directory,
-      owner  => "${mintHarvesterUser}",
-      mode   => 0700
+      owner  => $mintHarvesterUser,
+      mode   => '0700'
     } -> file { "/home/${mintHarvesterUser}/.profile":
       ensure  => file,
-      owner   => "${mintHarvesterUser}",
-      content => "umask 002",
+      owner   => $mintHarvesterUser,
+      content => 'umask 002',
     } -> file { "/home/${mintHarvesterUser}/.ssh":
       ensure => directory,
-      owner  => "${mintHarvesterUser}",
-      mode   => 0700
+      owner  => $mintHarvesterUser,
+      mode   => '0700'
     } -> exec { "Use public SSH key used in instance creation for user '${mintHarvesterUser}'":
       command => "cp -R /home/ec2-user/.ssh/authorized_keys /home/${mintHarvesterUser}/.ssh/authorized_keys && chown -R ${mintHarvesterUser} /home/${mintHarvesterUser}/.ssh && chmod -R go-rwx /home/${mintHarvesterUser}/.ssh",
       path    => ['/usr/bin', '/usr/sbin', '/bin'],
@@ -267,32 +267,32 @@ define puppet_redbox::add_harvesters_complete (
     }
   } else {
     user { 'Add tomcat user':
-      name   => 'tomcat',
       ensure => present,
+      name   => 'tomcat',
     } -> file { '/home/tomcat':
       ensure => directory,
       owner  => 'tomcat',
     } -> user { "Creating user '${mintHarvesterUser}'":
-      name   => "${mintHarvesterUser}",
       ensure => present,
+      name   => $mintHarvesterUser,
       gid    => 'tomcat',
     } -> file { "/home/${mintHarvesterUser}/":
       ensure => directory,
-      owner  => "${mintHarvesterUser}",
-      mode   => 0700
+      owner  => $mintHarvesterUser,
+      mode   => '0700'
     } -> file { "/home/${mintHarvesterUser}/.profile":
       ensure  => file,
-      owner   => "${mintHarvesterUser}",
+      owner   => $mintHarvesterUser,
       content => 'umask 002',
     } -> file { "/home/${mintHarvesterUser}/.ssh":
       ensure => directory,
-      owner  => "${mintHarvesterUser}",
-      mode   => 0700
+      owner  => $mintHarvesterUser,
+      mode   => '0700'
     } -> ssh_authorized_key { "Injecting Public SSH Key for user '${mintHarvesterUser}'":
-      name   => "${mintHarvesterUser}",
       ensure => present,
-      key    => "${mintHarvesterSshKey}",
-      user   => "${$mintHarvesterUser}",
+      name   => $mintHarvesterUser,
+      key    => $mintHarvesterSshKey,
+      user   => $mintHarvesterUser,
       type   => ssh-rsa
     }
   }

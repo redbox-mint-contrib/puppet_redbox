@@ -1,0 +1,5 @@
+HOSTS:
+  el-6.7-x86_64-agent:
+    roles:
+      - agent
+    platform: el-6.7-x86_64

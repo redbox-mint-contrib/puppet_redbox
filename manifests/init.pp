@@ -165,29 +165,29 @@ class puppet_redbox (
     base_server_url => $server_url,
     proxy           => $proxy,
     require         => [Puppet_common::Add_systemuser[$redbox_user], Class['Puppet_common::Java']],
-    before          => puppet_redbox::Institutional_build::Overlay[$packages[institutional_build]],
+    before          => Puppet_redbox::Institutional_build::Overlay[$packages[institutional_build]],
     notify          => Service['httpd']
   }
 
   if ($packages[institutional_build]) {
-    puppet_redbox::institutional_build::overlay { $packages[institutional_build]: 
+    puppet_redbox::institutional_build::overlay { $packages[institutional_build]:
       system_install_directory => $packages[install_directory], }
   }
 
-  exec { 'service httpd restart': require => puppet_redbox::Add_redbox_package[values($packages)], }
+  exec { 'service httpd restart': require => Puppet_redbox::Add_redbox_package[values($packages)], }
 
   if ($crontab) {
-    puppet_common::add_cron { $crontab: cron_path => join($exec_path, ":"), }
+    puppet_common::add_cron { $crontab: cron_path => join($exec_path, ':'), }
   }
 
   # Check flag whether to install Harvester stack
   if $install_type == 'harvester-complete' {
-    puppet_redbox::add_harvesters_complete { "/opt/harvester/": }
+    puppet_redbox::add_harvesters_complete { '/opt/harvester/': }
   }
 
   tidy { '/var/lib/puppet/reports':
     age     => '1w',
     recurse => true,
-    matches => ["*.yaml"],
+    matches => ['*.yaml'],
   }
 }
