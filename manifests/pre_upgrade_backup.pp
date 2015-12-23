@@ -25,19 +25,19 @@ define puppet_redbox::pre_upgrade_backup (
   if ($system_name == undef) {
     fail("Must define a system name before backup for ${backup_source}.")
   }
-  $backup_destination = "${backup_destination_parent_path}/backup_${system_name}"
   validate_absolute_path($backup_source)
+
+  $backup_destination = "${backup_destination_parent_path}/backup_${system_name}"
   validate_absolute_path($backup_destination)
+  exec { "stop ${system_name} before backup": command => "service ${system_name} stop", }
 
-  exec { "stop ${system_name} for backup": command => "service ${system_name} stop", }
-
-  file { $backup_destination_parent_path: ensure => directory, }
+  file { $backup_destination: ensure => directory, }
 
   $exclusions = join(suffix(prefix($exclude_directories, "--filter='- "), "'"), ' ')
 
   exec { "backup sources: ${$backup_source} to: ${backup_destination}":
     command => "/usr/bin/rsync -rcvzh ${exclusions} ${backup_source} ${backup_destination}/",
-    require => [File[$backup_destination_parent_path], Exec["stop ${system_name} for backup"]],
+    require => [File[$backup_destination], Exec["stop ${system_name} before backup"]],
     before  => Exec["start ${system_name} after backup"],
   }
 

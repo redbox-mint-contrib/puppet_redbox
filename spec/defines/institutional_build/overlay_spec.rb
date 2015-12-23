@@ -47,7 +47,7 @@ describe 'puppet_redbox::institutional_build::overlay' do
     it do
       should contain_exec("copy files from #{stubbed_local_repo} to #{stubbed_install_dir}").with({
         :command => "/usr/bin/rsync -rcvzh --filter='- .git*' --filter='- README*' #{stubbed_local_repo}/* #{stubbed_install_dir}/",
-      })
+      }).that_requires("Vcsrepo[clone #{stubbed_title} to #{stubbed_local_repo}]")
     end
   end
 
