@@ -1,16 +1,6 @@
 require 'spec_helper'
 
 describe 'puppet_redbox' do
-  #  shared_context "standard optional params" do
-  #    let(:title) {'/opt/redbox'}
-  #  end
-
-  #  let :default_params do
-  #    {
-  #      :backup_destination_parent_path => '/tmp',
-  #    }
-  #  end
-
   context "Given default parameters for standard redbox installation on CentOS" do
     let :facts do
       { :fqdn => 'site.domain.com.au',
