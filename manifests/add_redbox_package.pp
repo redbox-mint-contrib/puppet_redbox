@@ -22,34 +22,49 @@ define puppet_redbox::add_redbox_package (
 
   puppet_redbox::pre_upgrade_backup { $packages[install_directory]:
     system_name => $redbox_system,
-    requires    => Puppet_common::Add_directory[$packages[install_directory]],
-    before      => Package[$redbox_package],
+    require     => Puppet_common::Add_directory[$packages[install_directory]],
   }
 
   if ($packages[pre_install]) {
     package { $packages[pre_install]:
       require => Puppet_common::Add_directory[$packages[install_directory]],
-      before  => [
-        Package[$redbox_package],
-        puppet_redbox::Pre_upgrade_backup[$packages[install_directory]]],
+      before  => Package[$redbox_package],
     }
   }
 
   if ($packages[post_install]) {
-    package { $packages[post_install]: require => [
+    $before_list = []
+
+    if ($packages[institutional_build]) {
+      $before_list = concat($before_list, Puppet_redbox::Institutional_build::Overlay[$packages[
+          institutional_build]])
+    }
+
+    package { $packages[post_install]:
+      require => [
         Puppet_common::Add_directory[$packages[install_directory]],
-        Package[$redbox_package]], }
+        Package[$redbox_package]],
+      before  => $before_list,
+    }
   }
 
   package { $redbox_package: }
 
   if ($redbox_system == 'redbox') {
+    $before_list = []
+
+    if ($packages[institutional_build]) {
+      $before_list = concat($before_list, Puppet_redbox::Institutional_build::Overlay[$packages[
+          institutional_build]])
+    }
+
     puppet_redbox::update_system_config { [
       "${packages[install_directory]}/home/config-include/2-misc-modules/rapidaaf.json",
       "${packages[install_directory]}/home/config-include/plugins/rapidaaf.json"]:
       system_config => $system_config,
       notify        => Exec["${redbox_system}-restart_on_refresh"],
       subscribe     => Package[$redbox_package],
+      before        => $before_list,
     }
 
     if ($system_config and $system_config[api]) {
@@ -58,12 +73,14 @@ define puppet_redbox::add_redbox_package (
         line      => "\"apiKey\": \"${system_config[api][clients][apiKey]}\",",
         match     => "\"apiKey\":.*$",
         subscribe => Package[$redbox_package],
+        before    => $before_list,
       } ->
       file_line { 'update system-config.json api user':
         path      => "${packages[install_directory]}/home/config-include/2-misc-modules/apiSecurity.json",
         line      => "\"username\": \"${system_config[api][clients][username]}\"",
         match     => '\"username\":.*$',
         subscribe => Package[$redbox_package],
+        before    => $before_list,
       }
     }
   }
@@ -74,6 +91,19 @@ define puppet_redbox::add_redbox_package (
     server_url => $server_url,
     notify     => Exec["${redbox_system}-restart_on_refresh"],
     subscribe  => Package[$redbox_package],
+  }
+
+  if ($packages[institutional_build]) {
+    $require_list = [
+      Package[$redbox_package],
+      Puppet_redbox::Update_server_env["${packages[install_directory]}/server/tf_env.sh"]]
+
+    # # institutional overlay should be last of package/config installs
+    puppet_redbox::institutional_build::overlay { $packages[institutional_build]:
+      system_install_directory => $packages[install_directory],
+      notify                   => [Service[$redbox_system]],
+      require                  => $require_list,
+    }
   }
 
   service { $redbox_system:
@@ -95,12 +125,11 @@ define puppet_redbox::add_redbox_package (
   }
 
   #  mint is not always proxied
-  if ($redbox_system == 'mint' and !empty(grep(join($proxy, ','), 'http://localhost:9001/mint'))) {
-    puppet_redbox::prime_system { 'localhost:9001/mint':
-      subscribe => [
+  if ($redbox_system == 'mint' and !empty(grep([join($proxy, ',')], 'http://localhost:9001/mint')))
+  {
+    puppet_redbox::prime_system { 'localhost:9001/mint': subscribe => [
         Exec["${redbox_system}-restart_on_refresh"],
-        Service[$redbox_system]],
-    }
+        Service[$redbox_system]], }
   } else {
     puppet_redbox::prime_system { $server_url: subscribe => [
         Exec["${redbox_system}-restart_on_refresh"],

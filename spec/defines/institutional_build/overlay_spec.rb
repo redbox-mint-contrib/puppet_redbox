@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe 'puppet_redbox::institutional_build::overlay' do
   shared_context "stubbed params" do
-    let(:stubbed_title) {'https://github.com/redbox-mint-contrib/rb-sample-1.8-institutional-build'}
+    let (:stubbed_title) {'https://github.com/redbox-mint-contrib/rb-sample-1.8-institutional-build'}
     let(:stubbed_local_repo) {'/tmp/rb-sample-1.8-institutional-build'}
     let(:stubbed_install_dir) {'/opt/redbox'}
     let(:title) { stubbed_title }
@@ -10,10 +10,7 @@ describe 'puppet_redbox::institutional_build::overlay' do
 
   let :default_params do
     {
-      :institution_ssh_user     => 'root',
-      :revision                 => 'master',
       :system_install_directory => '/opt/redbox',
-      :local_repo_parent        => '/tmp'
     }
   end
 
@@ -24,13 +21,13 @@ describe 'puppet_redbox::institutional_build::overlay' do
     end
 
     it { should compile.with_all_deps }
-      
+
     it { should have_resource_count(3) }
-      
+
     it { should have_puppet_redbox__institutional_build__overlay_resource_count(1) }
-      
+
     it { should have_vcsrepo_resource_count(1) }
-      
+
     it { should have_exec_resource_count(1) }
 
     it do

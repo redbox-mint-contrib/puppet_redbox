@@ -165,13 +165,7 @@ class puppet_redbox (
     base_server_url => $server_url,
     proxy           => $proxy,
     require         => [Puppet_common::Add_systemuser[$redbox_user], Class['Puppet_common::Java']],
-    before          => Puppet_redbox::Institutional_build::Overlay[$packages[institutional_build]],
     notify          => Service['httpd']
-  }
-
-  if ($packages[institutional_build]) {
-    puppet_redbox::institutional_build::overlay { $packages[institutional_build]:
-      system_install_directory => $packages[install_directory], }
   }
 
   exec { 'service httpd restart': require => Puppet_redbox::Add_redbox_package[values($packages)], }

@@ -1,10 +1,6 @@
 require 'spec_helper'
 
 describe 'puppet_redbox::pre_upgrade_backup' do
-  #  shared_context "standard optional params" do
-  #    let(:title) {'/opt/redbox'}
-  #  end
-
   let :default_params do
     {
       :backup_destination_parent_path => '/tmp',

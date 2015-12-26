@@ -6,7 +6,7 @@ class puppet_redbox::add_proxy_server (
   $ssl_config = undef,
   $has_ssl    = undef,) {
   case $::operatingsystem {
-    'centos', 'redhat', 'fedora' : {
+    'CentOS', 'RedHat', 'Fedora' : {
       $conf_dir = '/etc/httpd/conf.d'
       $log_dir = '/etc/httpd/logs'
       $apache_conf = '/etc/httpd/conf/httpd.conf'
