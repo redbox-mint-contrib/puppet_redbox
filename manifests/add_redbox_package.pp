@@ -125,7 +125,7 @@ define puppet_redbox::add_redbox_package (
   }
 
   #  mint is not always proxied
-  if ($redbox_system == 'mint' and !empty(grep([join($proxy, ',')], 'http://localhost:9001/mint')))
+  if ($redbox_system == 'mint' and $proxy and !empty(grep([join($proxy, ',')], 'http://localhost:9001/mint')))
   {
     puppet_redbox::prime_system { 'localhost:9001/mint': subscribe => [
         Exec["${redbox_system}-restart_on_refresh"],
