@@ -53,35 +53,41 @@ describe 'puppet_redbox' do
         :concat_basedir => '/tmp'}
     end
 
-        it {should compile.with_all_deps}
-    
-        it {
-          should contain_host('site.domain.com.au')
-          should contain_host('site')
-        }
-    
-        it {
-          should contain_user('redbox')
-        }
-    
-        it {
-          should contain_file('/opt').with({:ensure => 'directory',
-            :owner => 'root',
-            :group => 'root',
-            :mode => '0755'})
-        }
-    
-        it {
-          should contain_package('java')
-          should contain_class('puppet_redbox::add_proxy_server')
-          should contain_yumrepo('redbox_releases')
-          should contain_yumrepo('redbox_snapshots')
-        }
+    it {should compile.with_all_deps}
+
+    it {
+      should contain_host('site.domain.com.au')
+      should contain_host('site')
+    }
+
+    it {
+      should contain_user('redbox')
+    }
+
+    it {
+      should contain_file('/opt').with({:ensure => 'directory',
+        :owner => 'root',
+        :group => 'root',
+        :mode => '0755'})
+    }
+
+    it {
+      should contain_package('java')
+      should contain_class('puppet_redbox::add_proxy_server')
+      should contain_yumrepo('redbox_releases')
+      should contain_yumrepo('redbox_snapshots')
+    }
 
     it {
       should contain_puppet_redbox__add_redbox_package(redbox_package).with({
         :owner           => 'redbox',
-        :has_ssl         => 'false',
+        :has_ssl         => false,
+        :base_server_url => '10.5.6.7',
+        :proxy           => proxy
+      })
+      should contain_puppet_redbox__add_redbox_package(mint_package).with({
+        :owner           => 'redbox',
+        :has_ssl         => false,
         :base_server_url => '10.5.6.7',
         :proxy           => proxy
       })
