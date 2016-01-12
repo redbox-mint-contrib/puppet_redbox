@@ -82,7 +82,7 @@ class puppet_redbox (
     ,
     key   => {
       file => "/etc/ssl/local_certs/${::fqdn}.key",
-      mode => 0444
+      mode => '0444'
     }
     ,
     chain => {
@@ -155,7 +155,7 @@ class puppet_redbox (
       proxy      => $proxy,
     }
 
-    #  Force apache restart after puppet module as guarantee that all latest config refreshed -
+    #  Force apache restart after puppet module as guarantee that latest redbox refreshed -
     #  problem occurs when duplicating httpd 'service' call already made by apache module (hence use
     #  of 'exec') or when change made to redbox which doesn't trigger httpd service (as it is
     #  already running).
