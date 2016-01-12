@@ -148,11 +148,19 @@ class puppet_redbox (
     class { 'puppet_redbox::add_proxy_server':
       require    => Class['Puppet_common::Java'],
       before     => Puppet_redbox::Add_redbox_package[values($packages)],
+      notify     => Service['httpd'],
       server_url => $server_url,
       has_ssl    => $has_ssl,
       ssl_config => $ssl_config,
       proxy      => $proxy,
-    } ~> Service['httpd']
+    }
+
+    #  Force apache restart after puppet module as guarantee that all latest config refreshed -
+    #  problem occurs when duplicating httpd 'service' call already made by apache module (hence use
+    #  of 'exec') or when change made to redbox which doesn't trigger httpd service (as it is
+    #  already running).
+    exec { 'service httpd restart': require => Puppet_redbox::Add_redbox_package[values($packages)],
+    }
 
   }
 
@@ -165,12 +173,7 @@ class puppet_redbox (
     base_server_url => $server_url,
     proxy           => $proxy,
     require         => [Puppet_common::Add_systemuser[$redbox_user], Class['Puppet_common::Java']],
-    notify          => Service['httpd']
   }
-
-  #  force apache restart after puppet module as guarantee that all latest config refreshed -
-  #  problem occurs when duplicating call already made by apache module (hence use of 'exec')
-  exec { 'service httpd restart': require => Puppet_redbox::Add_redbox_package[values($packages)], }
 
   if ($crontab) {
     puppet_common::add_cron { $crontab: cron_path => join($exec_path, ':'), }
