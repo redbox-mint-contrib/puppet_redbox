@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe 'puppet_redbox' do
-  shared_context "stubbed redbox_package" do
+  shared_context "default redbox_package" do
     let :redbox_package do {
         'system' => 'redbox',
         'package' => 'redbox-distro',
@@ -40,7 +40,7 @@ describe 'puppet_redbox' do
     end
   end
   context "Given default parameters for standard redbox installation on CentOS" do
-    include_context "stubbed redbox_package"
+    include_context "default redbox_package"
     let :facts do
       { :fqdn => 'site.domain.com.au',
         :hostname => 'site',
@@ -76,6 +76,13 @@ describe 'puppet_redbox' do
       should contain_class('puppet_redbox::add_proxy_server')
       should contain_yumrepo('redbox_releases')
       should contain_yumrepo('redbox_snapshots')
+      should contain_service('httpd')
+      should contain_exec('service httpd restart')
+    }
+    
+    it {
+      should_not contain_puppet_common__add_cron
+      should_not contain_puppet_redbox__add_harvesters_complete
     }
 
     it {
@@ -84,13 +91,17 @@ describe 'puppet_redbox' do
         :has_ssl         => false,
         :base_server_url => '10.5.6.7',
         :proxy           => proxy
-      })
+      }).that_requires(['Puppet_common::Add_systemuser[redbox]','Class[Puppet_common::Java]'])
+        .that_notifies('Service[httpd]')
+        .that_comes_before('Exec[service httpd restart]')
       should contain_puppet_redbox__add_redbox_package(mint_package).with({
         :owner           => 'redbox',
         :has_ssl         => false,
         :base_server_url => '10.5.6.7',
         :proxy           => proxy
-      })
+      }).that_requires(['Puppet_common::Add_systemuser[redbox]','Class[Puppet_common::Java]'])
+      .that_notifies('Service[httpd]')
+      .that_comes_before('Exec[service httpd restart]')
     }
 
   end

@@ -168,6 +168,8 @@ class puppet_redbox (
     notify          => Service['httpd']
   }
 
+  #  force apache restart after puppet module as guarantee that all latest config refreshed -
+  #  problem occurs when duplicating call already made by apache module (hence use of 'exec')
   exec { 'service httpd restart': require => Puppet_redbox::Add_redbox_package[values($packages)], }
 
   if ($crontab) {
