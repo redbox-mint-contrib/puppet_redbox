@@ -63,16 +63,25 @@ describe 'puppet_redbox' do
       'url'  => 'http://localhost:8080/oai-server'
     }]
   end
+  let (:default_install_parent_directory_parameter) {'/opt'}
+  let (:default_has_ssl_parameter) {false}
+  let (:default_redbox_user_parameter) {'redbox'}
+  let :default_params do {
+    :packages => { 
+           'redbox' => default_redbox_package_parameters, 
+           'mint' => default_mint_package_parameters
+     },
+     :proxy => default_proxy_parameters,
+     :install_parent_directory => default_install_parent_directory_parameter,
+     :has_ssl => default_has_ssl_parameter,
+     :redbox_user => default_redbox_user_parameter
+  }
+  end
   context "Given default parameters for standard redbox installation on CentOS" do
     include_context "default facts"
     include_context "always should"
-    let :params do {
-          'packages' => { 
-                  'redbox' => default_redbox_package_parameters, 
-                  'mint' => default_mint_package_parameters
-          },
-          'proxy' => default_proxy_parameters
-    }
+    let :params do
+      default_params
     end
 
     it 'Given fqdn: site.domain.com.au' do
@@ -82,7 +91,7 @@ describe 'puppet_redbox' do
 
     it 'Given default parameters' do
       should contain_user('redbox')
-      should contain_file('/opt').with({:ensure => 'directory',
+      should contain_file(default_install_parent_directory_parameter).with({:ensure => 'directory',
               :owner => 'root',
               :group => 'root',
               :mode => '0755'})
@@ -94,7 +103,7 @@ describe 'puppet_redbox' do
       should contain_class('puppet_redbox::add_proxy_server')
         .with({
           :server_url => '10.5.6.7',
-          :has_ssl => false,
+          :has_ssl => default_has_ssl_parameter,
           :ssl_config => {
             'cert'  => {
               'file'  => "/etc/ssl/local_certs/site.domain.com.au.crt"
@@ -121,8 +130,8 @@ describe 'puppet_redbox' do
     
     let :default_add_package_parameters do
       {
-        :owner           => 'redbox',
-        :has_ssl         => false,
+        :owner           => default_redbox_user_parameter,
+        :has_ssl         => default_has_ssl_parameter,
         :tf_env => '',
         :system_config => '',
         :base_server_url => '10.5.6.7',
