@@ -189,4 +189,5 @@ class puppet_redbox (
     recurse => true,
     matches => ['*.yaml'],
   }
+
 }

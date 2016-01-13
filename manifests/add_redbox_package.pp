@@ -25,6 +25,8 @@ define puppet_redbox::add_redbox_package (
     require     => Puppet_common::Add_directory[$packages[install_directory]],
   }
 
+  # TODO : add test to ensure can install a version on fresh vm (no matter what latest in yum is),
+  # or show logged error if already running a redbox instance
   if ($packages[pre_install]) {
     package { $packages[pre_install]:
       require => Puppet_common::Add_directory[$packages[install_directory]],
@@ -48,7 +50,12 @@ define puppet_redbox::add_redbox_package (
     }
   }
 
-  package { $redbox_package: }
+  $package_version = $packages[version] ? {
+    undef   => installed,
+    default => $packages[version],
+  }
+
+  package { $redbox_package: ensure => $package_version, }
 
   if ($redbox_system == 'redbox') {
     $before_list = []
@@ -125,8 +132,8 @@ define puppet_redbox::add_redbox_package (
   }
 
   #  mint is not always proxied
-  if ($redbox_system == 'mint' and $proxy and !empty(grep([join($proxy, ',')], 'http://localhost:9001/mint')))
-  {
+  if ($redbox_system == 'mint' and $proxy and !empty(grep([join($proxy, ',')], 'http://localhost:9001/mint'
+  ))) {
     puppet_redbox::prime_system { 'localhost:9001/mint': subscribe => [
         Exec["${redbox_system}-restart_on_refresh"],
         Service[$redbox_system]], }
@@ -137,4 +144,26 @@ define puppet_redbox::add_redbox_package (
   }
 
   puppet_redbox::add_tidy { $redbox_system: require => Service[$redbox_system], }
+
+  puppet_redbox::link { "link ${redbox_system} data":
+    target      => prefix(['storage', 'solr', 'home/database', 'home/activemq-data'], "${packages[
+        install_directory]}/"),
+    destination => "/mnt/data/${redbox_system}",
+    owner       => $owner,
+    require     => Package[$redbox_package],
+  }
+
+  puppet_redbox::link { "link ${redbox_system} logs":
+    target      => "${packages[install_directory]}/home/logs",
+    destination => "/mnt/logs/${redbox_system}",
+    owner       => $owner,
+    require     => Package[$redbox_package],
+  }
+
+  file { "/var/log/${redbox_system}":
+    ensure  => link,
+    target  => "/mnt/logs/${redbox_system}",
+    require => Puppet_redbox::Link["link ${redbox_system} logs"],
+    owner   => $owner,
+  }
 }
