@@ -31,17 +31,14 @@ describe 'puppet_redbox' do
           :matches => ['*.yaml']})
        }
   end
-  shared_context "default redbox parameters" do
-    let :redbox_package do {
+  let :default_redbox_package_stub do {
         'system' => 'redbox',
         'package' => 'redbox-distro',
         'server_url_context' => 'redbox',
-        'install_directory' => '/opt/redbox',
-        'institutional_build' => :undef,
-      }
-    end
-    let :mint_package do
-      {
+        'install_directory' => '/opt/redbox'
+  }
+  end
+  let :default_mint_package_stub do {
         'system' => 'mint',
         'package' => 'mint-distro',
         'server_url_context' => 'mint',
@@ -49,30 +46,34 @@ describe 'puppet_redbox' do
         'pre_install'         => 'unzip',
         'post_install'        => [
         'mint-solr-geonames',
-        'mint-build-distro-initial-data'],
-        'institutional_build' => :undef
-      }
-    end
-    let :proxy do
-      [ {
-        'path' => '/mint',
-        'url'=> 'http://localhost:9001/mint'
-        },
-        {
-        'path' => '/redbox',
-        'url'=> 'http://localhost:9000/redbox'
-        },
-        {
-        'path' => '/oai-server',
-        'url'  => 'http://localhost:8080/oai-server'
-        }
-      ]
-    end
+        'mint-build-distro-initial-data']
+  }
+  end
+  let :proxy do
+    [{
+      'path' => '/mint',
+      'url'=> 'http://localhost:9001/mint'
+      },
+      {
+      'path' => '/redbox',
+      'url'=> 'http://localhost:9000/redbox'
+      },
+      {
+      'path' => '/oai-server',
+      'url'  => 'http://localhost:8080/oai-server'
+    }]
   end
   context "Given default parameters for standard redbox installation on CentOS" do
     include_context "stubbed facts"
-    include_context "default redbox parameters"
     include_context "always should"
+    let :params do {
+          'packages' => { 
+                  'redbox' => default_redbox_package_stub, 
+                  'mint' => default_mint_package_stub
+          },
+          'proxy' => proxy
+    }
+    end
 
     it 'Given fqdn: site.domain.com.au' do
       should contain_host('site.domain.com.au')
@@ -106,16 +107,27 @@ describe 'puppet_redbox' do
               'file'  => "/etc/ssl/local_certs/site.domain.com.au.chain"
             }
           },
-          :proxy => proxy
-         })
+          :proxy => [{
+              'path' => '/mint',
+              'url'=> 'http://localhost:9001/mint'
+            },
+            {
+              'path' => '/redbox',
+              'url'=> 'http://localhost:9000/redbox'
+            },
+            {
+              'path' => '/oai-server',
+              'url'  => 'http://localhost:8080/oai-server'
+          }]
+        })
         .that_requires('Package[java]')
-        .that_comes_before("Puppet_redbox::Add_redbox_package[#{redbox_package}]")
-        .that_comes_before("Puppet_redbox::Add_redbox_package[#{mint_package}]")
+        .that_comes_before("Puppet_redbox::Add_redbox_package[#{default_redbox_package_stub}]")
+        .that_comes_before("Puppet_redbox::Add_redbox_package[#{default_mint_package_stub}]")
         .that_notifies('Service[httpd]')
       
       should contain_exec('service httpd restart')
-        .that_requires("Puppet_redbox::Add_redbox_package[#{redbox_package}]")
-        .that_requires("Puppet_redbox::Add_redbox_package[#{mint_package}]")
+        .that_requires("Puppet_redbox::Add_redbox_package[#{default_redbox_package_stub}]")
+        .that_requires("Puppet_redbox::Add_redbox_package[#{default_mint_package_stub}]")
     end
     
     let :add_package_default_parameters do
@@ -125,14 +137,39 @@ describe 'puppet_redbox' do
         :tf_env => '',
         :system_config => '',
         :base_server_url => '10.5.6.7',
-        :proxy           => proxy
+        :proxy           => [{
+          'path' => '/mint',
+          'url'=> 'http://localhost:9001/mint'
+        },
+        {
+          'path' => '/redbox',
+          'url'=> 'http://localhost:9000/redbox'
+        },
+        {
+          'path' => '/oai-server',
+          'url'  => 'http://localhost:8080/oai-server'
+        }]
       }
     end
     it {
-      should contain_puppet_redbox__add_redbox_package(redbox_package).with(add_package_default_parameters)
+      should contain_puppet_redbox__add_redbox_package({
+        'system' => 'redbox',
+        'package' => 'redbox-distro',
+        'server_url_context' => 'redbox',
+        'install_directory' => '/opt/redbox'
+      }).with(add_package_default_parameters)
         .that_requires(['User[redbox]','Package[java]'])
         .that_comes_before('Exec[service httpd restart]')
-      should contain_puppet_redbox__add_redbox_package(mint_package).with(add_package_default_parameters)
+      should contain_puppet_redbox__add_redbox_package({
+        'system' => 'mint',
+        'package' => 'mint-distro',
+        'server_url_context' => 'mint',
+        'install_directory' => '/opt/mint',
+        'pre_install'         => 'unzip',
+        'post_install'        => [
+        'mint-solr-geonames',
+        'mint-build-distro-initial-data']
+      }).with(add_package_default_parameters)
         .that_requires(['User[redbox]','Package[java]'])
         .that_comes_before('Exec[service httpd restart]')
     }

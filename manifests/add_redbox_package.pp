@@ -35,18 +35,18 @@ define puppet_redbox::add_redbox_package (
   }
 
   if ($packages[post_install]) {
-    $before_list = []
-
     if ($packages[institutional_build]) {
-      $before_list = concat($before_list, Puppet_redbox::Institutional_build::Overlay[$packages[
-          institutional_build]])
+      $before_post_install_list = [Puppet_redbox::Institutional_build::Overlay[$packages[
+            institutional_build]]]
+    } else {
+      $before_post_install_list = []
     }
 
     package { $packages[post_install]:
       require => [
         Puppet_common::Add_directory[$packages[install_directory]],
         Package[$redbox_package]],
-      before  => $before_list,
+      before  => $before_post_install_list,
     }
   }
 
@@ -58,11 +58,10 @@ define puppet_redbox::add_redbox_package (
   package { $redbox_package: ensure => $package_version, }
 
   if ($redbox_system == 'redbox') {
-    $before_list = []
-
     if ($packages[institutional_build]) {
-      $before_list = concat($before_list, Puppet_redbox::Institutional_build::Overlay[$packages[
-          institutional_build]])
+      $before_list = [Puppet_redbox::Institutional_build::Overlay[$packages[institutional_build]]]
+    } else {
+      $before_list = []
     }
 
     puppet_redbox::update_system_config { [
@@ -145,20 +144,21 @@ define puppet_redbox::add_redbox_package (
 
   puppet_redbox::add_tidy { $redbox_system: require => Service[$redbox_system], }
 
-  $link_targets = prefix(['storage', 'solr', 'home/database', 'home/activemq-data'], "${redbox_system}/")
+  $link_targets = prefix(['storage', 'solr', 'home/database', 'home/activemq-data'],
+  "${redbox_system}/")
 
-  puppet_redbox::link{ $link_targets:
+  puppet_redbox::link { $link_targets:
     target_parent => '/opt',
-    relocation => '/mnt/data',
-    owner => $owner,
-    require => Package[$redbox_package],
+    relocation    => '/mnt/data',
+    owner         => $owner,
+    require       => Package[$redbox_package],
   }
 
   puppet_redbox::link { "${redbox_system}/home/logs":
     target_parent => '/opt',
-    relocation => '/mnt/logs',
-    owner => $owner,
-    require => Package[$redbox_package],
+    relocation    => '/mnt/logs',
+    owner         => $owner,
+    require       => Package[$redbox_package],
   }
 
   file { "/var/log/${redbox_system}":

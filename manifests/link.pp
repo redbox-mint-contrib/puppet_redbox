@@ -2,7 +2,13 @@ define puppet_redbox::link (
   $target        = $title,
   $target_parent = undef,
   $relocation    = undef,
-  $owner         = undef,) {
+  $owner         = undef,
+  $exec_path     = ['/usr/local/bin', '/opt/local/bin', '/usr/bin', '/usr/sbin', '/bin', '/sbin'],)
+{
+  Exec {
+    path      => $exec_path,
+    logoutput => true,
+  }
   ensure_resource('file', $relocation, {
     'ensure' => 'directory'
   }
