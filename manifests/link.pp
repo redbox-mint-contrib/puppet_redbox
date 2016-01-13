@@ -1,19 +1,29 @@
-define puppet_redbox::link ($target = $title, $destination = undef, $owner = undef,) {
-  if ($target == undef) {
-    fail('Must specify target for conversion to link.')
+define puppet_redbox::link (
+  $target        = $title,
+  $target_parent = undef,
+  $relocation    = undef,
+  $owner         = undef,) {
+  ensure_resource('file', $relocation, {
+    'ensure' => 'directory'
+  }
+  )
+
+  exec { "mv ${target}":
+    command => "mv ${target_parent}/${target} ${relocation}/${target}",
+    require => File[$relocation],
   }
 
-  if ($destination == undef) {
-    fail('Must specify destination for relocation and link.')
-  }
-
-  exec { "mv ${target} ${destination}": }
-
-  file { $target:
-    ensure  => link,
-    target  => $destination,
-    require => Exec["mv ${target} ${destination}"],
+  file { "${relocation}/${target}":
     owner   => $owner,
+    ensure  => directory,
+    recurse => true,
+    require => Exec["mv ${target}"],
+  }
+
+  file { "${target_parent}/${target}":
+    ensure  => link,
+    target  => "${relocation}/${target}",
+    require => Exec["mv ${target}"],
   }
 
 }

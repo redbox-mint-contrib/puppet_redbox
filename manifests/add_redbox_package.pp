@@ -145,25 +145,26 @@ define puppet_redbox::add_redbox_package (
 
   puppet_redbox::add_tidy { $redbox_system: require => Service[$redbox_system], }
 
-  puppet_redbox::link { "link ${redbox_system} data":
-    target      => prefix(['storage', 'solr', 'home/database', 'home/activemq-data'], "${packages[
-        install_directory]}/"),
-    destination => "/mnt/data/${redbox_system}",
-    owner       => $owner,
-    require     => Package[$redbox_package],
+  $link_targets = prefix(['storage', 'solr', 'home/database', 'home/activemq-data'], "${redbox_system}/")
+
+  puppet_redbox::link{ $link_targets:
+    target_parent => '/opt',
+    relocation => '/mnt/data',
+    owner => $owner,
+    require => Package[$redbox_package],
   }
 
-  puppet_redbox::link { "link ${redbox_system} logs":
-    target      => "${packages[install_directory]}/home/logs",
-    destination => "/mnt/logs/${redbox_system}",
-    owner       => $owner,
-    require     => Package[$redbox_package],
+  puppet_redbox::link { "${redbox_system}/home/logs":
+    target_parent => '/opt',
+    relocation => '/mnt/logs',
+    owner => $owner,
+    require => Package[$redbox_package],
   }
 
   file { "/var/log/${redbox_system}":
     ensure  => link,
     target  => "/mnt/logs/${redbox_system}",
-    require => Puppet_redbox::Link["link ${redbox_system} logs"],
+    require => Puppet_redbox::Link["${redbox_system}/home/logs"],
     owner   => $owner,
   }
 }
