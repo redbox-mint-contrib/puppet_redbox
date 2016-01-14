@@ -84,6 +84,8 @@ describe 'puppet_redbox' do
       default_params
     end
 
+  it {should compile.with_all_deps}
+    
     it 'Given fqdn: site.domain.com.au' do
       should contain_host('site.domain.com.au')
       should contain_host('site')
