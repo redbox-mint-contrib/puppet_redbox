@@ -28,7 +28,7 @@ define puppet_redbox::add_redbox_package (
     before      => Package[$redbox_package]
   }
 
-  # TODO : add test to ensure can install a version on fresh vm (no matter what latest in yum is),
+#  TODO : add test to ensure can install a version on fresh vm (no matter what latest in yum is),
   # or show logged error if already running a redbox instance
   if ($packages[pre_install]) {
     package { $packages[pre_install]:
@@ -99,7 +99,6 @@ define puppet_redbox::add_redbox_package (
     has_ssl    => $has_ssl,
     server_url => $server_url,
     notify     => Exec["${redbox_system}-restart_on_refresh"],
-#    before     => Puppet_redbox::Move_and_link_all[$redbox_system],
     subscribe  => Package[$redbox_package],
   }
 
@@ -111,7 +110,6 @@ define puppet_redbox::add_redbox_package (
       system_install_directory => $packages[install_directory],
       notify                   => [Service[$redbox_system]],
       require                  => $require_list,
-#      before                   => Puppet_redbox::Move_and_link_all[$redbox_system],
     }
   }
 
