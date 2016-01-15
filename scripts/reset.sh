@@ -7,6 +7,7 @@ usage() {
 }
 usage
 
+pkill -u redbox
 userdel -r redbox
 
 rm -Rf /opt/deploy

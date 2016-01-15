@@ -12,34 +12,47 @@ usage
 export LOG_DEST=/var/log/puppet/puppet.log
 
 # Install Puppet
-rpm -ivh http://yum.puppetlabs.com/el/6/products/x86_64/puppetlabs-release-6-7.noarch.rpm
-yum install -y puppet
+#rpm -ivh http://yum.puppetlabs.com/el/6/products/x86_64/puppetlabs-release-6-7.noarch.rpm
+#yum install -y puppet
 touch $LOG_DEST
 
 # Install Basic Puppet Modules
-puppet module install --force --version 1.0.2 puppetlabs/concat
-puppet module install --force --version 4.3.2 puppetlabs/stdlib
-puppet module install --force --version 1.1.1 puppetlabs/apache
+#puppet module install --force --version 1.0.2 puppetlabs/concat
+#puppet module install --force --version 4.3.2 puppetlabs/stdlib
+#puppet module install --force --version 1.1.1 puppetlabs/apache
 
 
 ## placed here instead of puppet as temp workaround
-yum install -y yum-priorities
+#yum install -y yum-priorities
 
-# Pull down ReDBox Puppet configuration
-yum -y install git && git clone https://github.com/redbox-mint-contrib/puppet_redbox.git /tmp/puppet_redbox && rm -Rf /tmp/puppet_redbox/.git*
-# Pull down ReDBox Puppet common
-git clone https://github.com/redbox-mint-contrib/puppet_common.git /usr/share/puppet/modules/puppet_common
+#yum -y install git
 
-# Double check if we have the Puppet configuration
-echo "checking puppet_redbox cloned/copied to /tmp"
-find /tmp -maxdepth 1 -iname "puppet_redbox" || exit 1
+install_git_module() {
+    git_owner=redbox-mint-contrib
+    echo "installing module: $1"
+    # Pull down ReDBox Puppet configuration
+    git clone https://github.com/$git_owner/$1.git /tmp/$1 && rm -Rf /tmp/$1/.git*
+    
+    # Double check if we have the Puppet configuration
+    echo "checking $1 cloned/copied to /tmp"
+    find /tmp -maxdepth 1 -iname "$1" || exit 1
+    
+    echo "removing existing puppet module"
+    rm -Rf /usr/share/puppet/modules/$1
+    echo "copying $1 to module path"
+    cp -Rf /tmp/$1 /usr/share/puppet/modules/
+    echo "cleaning up tmp"
+    rm -Rf /tmp/$1
+}
 
-echo "removing existing puppet module"
+#install_git_module puppet_redbox
+#install_git_module puppet_common
+
+##TODO : NB: debug code -remove!!!
 rm -Rf /usr/share/puppet/modules/puppet_redbox
-echo "copying redbox to module path"
-cp -Rf /tmp/puppet_redbox /usr/share/puppet/modules/
-echo "cleaning up tmp"
-rm -Rf /tmp/puppet_redbox
+cp -R /home/ec2-user/puppet_redbox /usr/share/puppet/modules
+rm -Rf /usr/share/puppet/modules/puppet_common
+cp -R /home/ec2-user/puppet_common /usr/share/puppet/modules
 
 # Check if we have to install other components, purposely injected here to make Hiera optional.
 INSTALL_TYPE="basic"
@@ -72,13 +85,3 @@ fi
 # Install ReDBox
 puppet apply --logdest ${LOG_DEST} -e "class {'puppet_redbox': install_type=>'$INSTALL_TYPE'}"
 
-# ReDBox admin is part of the default install
-git clone https://github.com/redbox-mint-contrib/puppet_redbox_admin.git /usr/share/puppet/modules/puppet_redbox_admin
-wget -O /etc/yum.repos.d/elasticsearch.repo https://raw.githubusercontent.com/redbox-mint-contrib/puppet_redbox_admin/master/support/elasticsearch.repo
-chown -R redbox:redbox /tmp/redbox
-puppet module install elasticsearch-elasticsearch --version 0.4.0
-puppet module install elasticsearch-logstash --version 0.5.1
-puppet module install maestrodev-wget --version 1.5.6
-ES_CLUSTER_ID="es-cluster-`hostname`"
-ES_NODE_ID="es-node-`hostname`"
-puppet apply --logdest ${LOG_DEST} -e "class {'puppet_redbox_admin': es_clusterid=>'$ES_CLUSTER_ID', es_nodeid=>'$ES_NODE_ID'}"

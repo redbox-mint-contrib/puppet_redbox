@@ -22,25 +22,27 @@ define puppet_redbox::pre_upgrade_backup (
     logoutput => true,
   }
 
-  if ($system_name == undef) {
-    fail("Must define a system name before backup for ${backup_source}.")
+  if ($::environment == 'production') {
+    if ($system_name == undef) {
+      fail("Must define a system name before backup for ${backup_source}.")
+    }
+    validate_absolute_path($backup_source)
+
+    $backup_destination = "${backup_destination_parent_path}/backup_${system_name}"
+    validate_absolute_path($backup_destination)
+
+    exec { "stop ${system_name} before backup": command => "service ${system_name} stop || echo 'service not running'", }
+
+    file { $backup_destination: ensure => directory, }
+
+    $exclusions = join(suffix(prefix($exclude_directories, "--filter='- "), "'"), ' ')
+
+    exec { "backup sources: ${$backup_source} to: ${backup_destination}":
+      command => "/usr/bin/rsync -rcvzh ${exclusions} ${backup_source} ${backup_destination}/",
+      require => [File[$backup_destination], Exec["stop ${system_name} before backup"]],
+      before  => Exec["restart ${system_name} after backup"],
+    }
+
+    exec { "restart ${system_name} after backup": command => "service ${system_name} restart || echo 'service not running'", }
   }
-  validate_absolute_path($backup_source)
-
-  $backup_destination = "${backup_destination_parent_path}/backup_${system_name}"
-  validate_absolute_path($backup_destination)
-  exec { "stop ${system_name} before backup": command => "service ${system_name} stop", }
-
-  file { $backup_destination: ensure => directory, }
-
-  $exclusions = join(suffix(prefix($exclude_directories, "--filter='- "), "'"), ' ')
-
-  exec { "backup sources: ${$backup_source} to: ${backup_destination}":
-    command => "/usr/bin/rsync -rcvzh ${exclusions} ${backup_source} ${backup_destination}/",
-    require => [File[$backup_destination], Exec["stop ${system_name} before backup"]],
-    before  => Exec["start ${system_name} after backup"],
-  }
-
-  exec { "start ${system_name} after backup": command => "service ${system_name} start", }
-
 }

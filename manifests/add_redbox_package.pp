@@ -15,6 +15,8 @@ define puppet_redbox::add_redbox_package (
   $redbox_package = $packages[package]
   $redbox_system = $packages[system]
 
+  $link_targets = prefix(['storage', 'solr', 'home/database', 'home/activemq-data'], "${redbox_system}/")
+
   puppet_common::add_directory { $packages[install_directory]:
     owner  => $owner,
     before => Package[$redbox_package]
@@ -23,29 +25,37 @@ define puppet_redbox::add_redbox_package (
   puppet_redbox::pre_upgrade_backup { $packages[install_directory]:
     system_name => $redbox_system,
     require     => Puppet_common::Add_directory[$packages[install_directory]],
+    before      => Package[$redbox_package]
   }
 
   # TODO : add test to ensure can install a version on fresh vm (no matter what latest in yum is),
   # or show logged error if already running a redbox instance
   if ($packages[pre_install]) {
     package { $packages[pre_install]:
-      require => Puppet_common::Add_directory[$packages[install_directory]],
-      before  => Package[$redbox_package],
+      require => [
+        Puppet_common::Add_directory[$packages[install_directory]],
+        Puppet_redbox::Pre_upgrade_backup[$packages[install_directory]]],
+      before  => [
+        Package[$redbox_package],
+        Puppet_redbox::Move_and_link_directory[$link_targets],
+        Puppet_redbox::Move_and_link_directory["${redbox_system}/home/logs"]],
     }
   }
 
   if ($packages[post_install]) {
     if ($packages[institutional_build]) {
-      $before_post_install_list = [Puppet_redbox::Institutional_build::Overlay[$packages[
-            institutional_build]]]
+      $before_post_install_list = [
+        Puppet_redbox::Institutional_build::Overlay[$packages[institutional_build]],
+        Puppet_redbox::Move_and_link_directory[$link_targets],
+        Puppet_redbox::Move_and_link_directory["${redbox_system}/home/logs"]]
     } else {
-      $before_post_install_list = []
+      $before_post_install_list = [
+        Puppet_redbox::Move_and_link_directory[$link_targets],
+        Puppet_redbox::Move_and_link_directory["${redbox_system}/home/logs"]]
     }
 
     package { $packages[post_install]:
-      require => [
-        Puppet_common::Add_directory[$packages[install_directory]],
-        Package[$redbox_package]],
+      require => Package[$redbox_package],
       before  => $before_post_install_list,
     }
   }
@@ -60,8 +70,6 @@ define puppet_redbox::add_redbox_package (
   if ($redbox_system == 'redbox') {
     if ($packages[institutional_build]) {
       $before_list = [Puppet_redbox::Institutional_build::Overlay[$packages[institutional_build]]]
-    } else {
-      $before_list = []
     }
 
     puppet_redbox::update_system_config { [
@@ -100,9 +108,7 @@ define puppet_redbox::add_redbox_package (
   }
 
   if ($packages[institutional_build]) {
-    $require_list = [
-      Package[$redbox_package],
-      Puppet_redbox::Update_server_env["${packages[install_directory]}/server/tf_env.sh"]]
+    $require_list = [Package[$redbox_package], Puppet_redbox::Update_server_env["${packages[install_directory]}/server/tf_env.sh"]]
 
     # # institutional overlay should be last of package/config installs
     puppet_redbox::institutional_build::overlay { $packages[institutional_build]:
@@ -131,40 +137,39 @@ define puppet_redbox::add_redbox_package (
   }
 
   #  mint is not always proxied
-  if ($redbox_system == 'mint' and $proxy and !empty(grep([join($proxy, ',')], 'http://localhost:9001/mint'
-  ))) {
-    puppet_redbox::prime_system { 'localhost:9001/mint': subscribe => [
+  if ($redbox_system == 'mint' and $proxy and !empty(grep([join($proxy, ',')], 'http://localhost:9001/mint'))) {
+    puppet_redbox::prime_system { 'localhost:9001/mint':
+      subscribe => [
         Exec["${redbox_system}-restart_on_refresh"],
-        Service[$redbox_system]], }
+        Service[$redbox_system]],
+    }
   } else {
     puppet_redbox::prime_system { $server_url: subscribe => [
         Exec["${redbox_system}-restart_on_refresh"],
         Service[$redbox_system]], }
   }
 
-  puppet_redbox::add_tidy { $redbox_system: require => Service[$redbox_system], }
-
-  $link_targets = prefix(['storage', 'solr', 'home/database', 'home/activemq-data'],
-  "${redbox_system}/")
-
-  puppet_redbox::link { $link_targets:
+  puppet_redbox::add_tidy { $redbox_system: require => Service[$redbox_system], } ->
+  puppet_redbox::move_and_link_directory { $link_targets:
     target_parent => '/opt',
     relocation    => '/mnt/data',
     owner         => $owner,
-    require       => Package[$redbox_package],
-  }
-
-  puppet_redbox::link { "${redbox_system}/home/logs":
+    system        => $redbox_system,
+    require       => Service[$redbox_system],
+  } ->
+  puppet_redbox::move_and_link_directory { "${redbox_system}/home/logs":
     target_parent => '/opt',
     relocation    => '/mnt/logs',
     owner         => $owner,
-    require       => Package[$redbox_package],
+    system        => $redbox_system,
+    require       => Service[$redbox_system],
   }
 
   file { "/var/log/${redbox_system}":
     ensure  => link,
     target  => "/mnt/logs/${redbox_system}",
-    require => Puppet_redbox::Link["${redbox_system}/home/logs"],
+    require => Puppet_redbox::Move_and_link_directory["${redbox_system}/home/logs"],
     owner   => $owner,
   }
+
 }
