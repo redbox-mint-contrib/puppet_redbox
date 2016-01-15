@@ -50,9 +50,9 @@ install_puppet
 touch $LOG_DEST
 
 # Install Basic Puppet Modules
-#puppet module install --force --version 1.0.2 puppetlabs/concat
-#puppet module install --force --version 4.3.2 puppetlabs/stdlib
-#puppet module install --force --version 1.1.1 puppetlabs/apache
+puppet module install --force --version 1.0.2 puppetlabs/concat
+puppet module install --force --version 4.3.2 puppetlabs/stdlib
+puppet module install --force --version 1.1.1 puppetlabs/apache
 
 
 ## placed here instead of puppet as temp workaround
@@ -76,14 +76,8 @@ install_git_module() {
     rm -Rf /tmp/$1
 }
 
-#install_git_module puppet_redbox
-#install_git_module puppet_common
-
-##TODO : NB: debug code -remove!!!
-rm -Rf /usr/share/puppet/modules/puppet_redbox
-cp -R /home/ec2-user/puppet_redbox /usr/share/puppet/modules
-rm -Rf /usr/share/puppet/modules/puppet_common
-cp -R /home/ec2-user/puppet_common /usr/share/puppet/modules
+install_git_module puppet_redbox
+install_git_module puppet_common
 
 # Check if we have to install other components, purposely injected here to make Hiera optional.
 INSTALL_TYPE="basic"
