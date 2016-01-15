@@ -12,7 +12,7 @@ usage
 export LOG_DEST=/var/log/puppet/puppet.log
 
 # Install Puppet
-export RUBY_VERSION=2.0.0.598
+export RUBY_VERSION=2.0.0
 export PUPPET_VERSION=3.8.4
 
 ## remove existing installation
@@ -31,10 +31,6 @@ install_ruby() {
  /usr/local/rvm/bin/rvm install ruby-${RUBY_VERSION}
 }
 
-source_ruby() {
- [[ -s /usr/local/rvm/scripts/rvm ]] && source /usr/local/rvm/scripts/rvm
- rvm use ${RUBY_VERSION} --default
-}
 
 # install modules required for puppet/ruby
 install_puppet() {
@@ -45,7 +41,9 @@ install_puppet() {
 
 reset
 install_ruby
-source_ruby
+##source_ruby
+[[ -s /usr/local/rvm/scripts/rvm ]] && source /usr/local/rvm/scripts/rvm
+rvm use ${RUBY_VERSION} --default
 install_puppet
 touch $LOG_DEST
 
@@ -76,7 +74,7 @@ install_git_module() {
     echo "cleaning up tmp"
     rm -Rf /tmp/$1
 }
-
+mkdir -p /usr/share/puppet/modules/
 install_git_module puppet_redbox
 install_git_module puppet_common
 
@@ -114,7 +112,6 @@ puppet apply --logdest ${LOG_DEST} -e "class {'puppet_redbox': install_type=>'$I
 # ReDBox admin is part of the default install
 git clone https://github.com/redbox-mint-contrib/puppet_redbox_admin.git /usr/share/puppet/modules/puppet_redbox_admin
 wget -O /etc/yum.repos.d/elasticsearch.repo https://raw.githubusercontent.com/redbox-mint-contrib/puppet_redbox_admin/master/support/elasticsearch.repo
-chown -R redbox:redbox /tmp/redbox
 puppet module install elasticsearch-elasticsearch --version 0.4.0
 puppet module install elasticsearch-logstash --version 0.5.1
 puppet module install maestrodev-wget --version 1.5.6
