@@ -53,6 +53,7 @@ touch $LOG_DEST
 puppet module install --force --version 1.0.2 puppetlabs/concat
 puppet module install --force --version 4.3.2 puppetlabs/stdlib
 puppet module install --force --version 1.1.1 puppetlabs/apache
+puppet module install --force --version 1.3.2 puppetlabs/vcsrepo
 
 
 ## placed here instead of puppet as temp workaround
