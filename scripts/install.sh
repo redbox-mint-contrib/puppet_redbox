@@ -12,8 +12,41 @@ usage
 export LOG_DEST=/var/log/puppet/puppet.log
 
 # Install Puppet
-#rpm -ivh http://yum.puppetlabs.com/el/6/products/x86_64/puppetlabs-release-6-7.noarch.rpm
-#yum install -y puppet
+export RUBY_VERSION=2.0.0.598
+export PUPPET_VERSION=3.8.4
+
+## remove existing installation
+reset() {
+ log_function $FUNCNAME
+ yum remove -y ruby facter puppet libyaml
+}
+
+## install ruby installer, rvm
+install_ruby() {
+ log_function $FUNCNAME
+ gpg2 --keyserver hkp://keys.gnupg.net --recv-keys D39DC0E3
+ curl -L get.rvm.io | bash -s stable
+ /usr/local/rvm/bin/rvm pkg install zlib
+ /usr/local/rvm/bin/rvm reinstall all --force
+ /usr/local/rvm/bin/rvm install ruby-${RUBY_VERSION}
+}
+
+source_ruby() {
+ [[ -s /usr/local/rvm/scripts/rvm ]] && source /usr/local/rvm/scripts/rvm
+ rvm use ${RUBY_VERSION} --default
+}
+
+# install modules required for puppet/ruby
+install_puppet() {
+ yum install -y augeas-libs augeas-devel compat-readline5 libselinux-ruby git
+ gem install ruby-augeas bundler
+ gem install puppet -v ${PUPPET_VERSION}
+}
+
+reset
+install_ruby
+source_ruby
+install_puppet
 touch $LOG_DEST
 
 # Install Basic Puppet Modules
@@ -23,9 +56,7 @@ touch $LOG_DEST
 
 
 ## placed here instead of puppet as temp workaround
-#yum install -y yum-priorities
-
-#yum -y install git
+yum install -y yum-priorities
 
 install_git_module() {
     git_owner=redbox-mint-contrib
@@ -45,8 +76,14 @@ install_git_module() {
     rm -Rf /tmp/$1
 }
 
-install_git_module puppet_redbox
-install_git_module puppet_common
+#install_git_module puppet_redbox
+#install_git_module puppet_common
+
+##TODO : NB: debug code -remove!!!
+rm -Rf /usr/share/puppet/modules/puppet_redbox
+cp -R /home/ec2-user/puppet_redbox /usr/share/puppet/modules
+rm -Rf /usr/share/puppet/modules/puppet_common
+cp -R /home/ec2-user/puppet_common /usr/share/puppet/modules
 
 # Check if we have to install other components, purposely injected here to make Hiera optional.
 INSTALL_TYPE="basic"
