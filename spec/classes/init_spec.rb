@@ -77,7 +77,9 @@ describe 'puppet_redbox' do
      :proxy => default_proxy_parameters,
      :install_parent_directory => default_install_parent_directory_parameter,
      :has_ssl => default_has_ssl_parameter,
-     :redbox_user => default_redbox_user_parameter
+     :redbox_user => default_redbox_user_parameter,
+     :relocation_data_dir      => '/mnt/data',
+     :relocation_logs_dir      => '/mnt/logs'
   }
   end
   context "Given default parameters for standard redbox installation on CentOS" do
@@ -150,6 +152,12 @@ describe 'puppet_redbox' do
       should contain_puppet_redbox__add_redbox_package(default_mint_package_parameters).with(default_add_package_parameters)
         .that_requires(['User[redbox]','Package[java]'])
         .that_comes_before('Exec[service httpd restart]')
+    }
+    it {
+      should contain_file('/mnt/data').with({:owner =>default_redbox_user_parameter, :recurse => true})
+      should contain_file('/mnt/logs').with({:owner =>default_redbox_user_parameter, :recurse => true})
+      should contain_puppet_redbox__move_and_link_all(default_redbox_package_parameters).with({:owner =>default_redbox_user_parameter})
+      should contain_puppet_redbox__move_and_link_all(default_mint_package_parameters).with({:owner =>default_redbox_user_parameter})
     }
   end
 end
