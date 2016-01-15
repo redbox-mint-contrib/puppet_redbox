@@ -45,14 +45,8 @@ install_git_module() {
     rm -Rf /tmp/$1
 }
 
-#install_git_module puppet_redbox
-#install_git_module puppet_common
-
-##TODO : NB: debug code -remove!!!
-rm -Rf /usr/share/puppet/modules/puppet_redbox
-cp -R /home/ec2-user/puppet_redbox /usr/share/puppet/modules
-rm -Rf /usr/share/puppet/modules/puppet_common
-cp -R /home/ec2-user/puppet_common /usr/share/puppet/modules
+install_git_module puppet_redbox
+install_git_module puppet_common
 
 # Check if we have to install other components, purposely injected here to make Hiera optional.
 INSTALL_TYPE="basic"
@@ -85,3 +79,13 @@ fi
 # Install ReDBox
 puppet apply --logdest ${LOG_DEST} -e "class {'puppet_redbox': install_type=>'$INSTALL_TYPE'}"
 
+# ReDBox admin is part of the default install
+git clone https://github.com/redbox-mint-contrib/puppet_redbox_admin.git /usr/share/puppet/modules/puppet_redbox_admin
+wget -O /etc/yum.repos.d/elasticsearch.repo https://raw.githubusercontent.com/redbox-mint-contrib/puppet_redbox_admin/master/support/elasticsearch.repo
+chown -R redbox:redbox /tmp/redbox
+puppet module install elasticsearch-elasticsearch --version 0.4.0
+puppet module install elasticsearch-logstash --version 0.5.1
+puppet module install maestrodev-wget --version 1.5.6
+ES_CLUSTER_ID="es-cluster-`hostname`"
+ES_NODE_ID="es-node-`hostname`"
+puppet apply --logdest ${LOG_DEST} -e "class {'puppet_redbox_admin': es_clusterid=>'$ES_CLUSTER_ID', es_nodeid=>'$ES_NODE_ID'}"
