@@ -43,9 +43,7 @@ class puppet_redbox (
       server_url_context  => 'mint',
       install_directory   => '/opt/mint',
       pre_install         => 'unzip',
-      post_install        => [
-        'mint-solr-geonames',
-        'mint-build-distro-initial-data'],
+      post_install        => ['mint-solr-geonames', 'mint-build-distro-initial-data'],
       institutional_build => undef,
     }
   }
@@ -112,7 +110,9 @@ class puppet_redbox (
     ]),
   $crontab                  = hiera_hash(crontab, undef),
   $tf_env                   = hiera_hash(tf_env, undef),
-  $system_config            = hiera_hash(system_config, undef)) {
+  $system_config            = hiera_hash(system_config, undef),
+  $relocation_data_dir      = '/mnt/data',
+  $relocation_logs_dir      = '/mnt/logs') {
   if ($has_dns and $::fqdn) {
     $server_url = $::fqdn
   } elsif ($::ipaddress) {
@@ -159,8 +159,7 @@ class puppet_redbox (
     #  problem occurs when duplicating httpd 'service' call already made by apache module (hence use
     #  of 'exec') or when change made to redbox which doesn't trigger httpd service (as it is
     #  already running).
-    exec { 'service httpd restart': require => Puppet_redbox::Add_redbox_package[values($packages)],
-    }
+    exec { 'service httpd restart': require => Puppet_redbox::Add_redbox_package[values($packages)], }
 
   }
 
@@ -174,6 +173,12 @@ class puppet_redbox (
     proxy           => $proxy,
     require         => [Puppet_common::Add_systemuser[$redbox_user], Class['Puppet_common::Java']],
   }
+  ->
+  file { [$relocation_data_dir, $relocation_logs_dir]:
+    owner   => $redbox_user,
+    recurse => true,
+  } ->
+  puppet_redbox::move_and_link_all { [values($packages)]: owner => $redbox_user, }
 
   if ($crontab) {
     puppet_common::add_cron { $crontab: cron_path => join($exec_path, ':'), }

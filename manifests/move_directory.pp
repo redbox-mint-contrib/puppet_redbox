@@ -11,11 +11,4 @@ define puppet_redbox::move_directory (
   include 'puppet_common'
 
   create_parent_directories($relocation_target)
-
-  #  # If need to copy: remove 'creates' parameter
-  #  # If need to copy and also clobber: also remove the '-n' parameter in 'move_options'
-  exec { "mv ${source_target}":
-    command => "echo source:`test -e ${source_target}` and target:`test -e ${relocation_target}`",
-    user    => 'root',
-  }
 }

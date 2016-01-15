@@ -6,7 +6,9 @@ define puppet_redbox::add_redbox_package (
   $tf_env          = undef,
   $system_config   = undef,
   $base_server_url = undef,
-  $proxy           = undef,) {
+  $proxy           = undef,
+    $relocation_data_dir = '/mnt/data',
+  $relocation_logs_dir = '/mnt/logs') {
   if ($packages[server_url_context]) {
     $server_url = "${base_server_url}/${packages[server_url_context]}"
   } else {
@@ -14,8 +16,6 @@ define puppet_redbox::add_redbox_package (
   }
   $redbox_package = $packages[package]
   $redbox_system = $packages[system]
-
-  $link_targets = prefix(['storage', 'solr', 'home/database', 'home/activemq-data'], "${redbox_system}/")
 
   puppet_common::add_directory { $packages[install_directory]:
     owner  => $owner,
@@ -35,10 +35,7 @@ define puppet_redbox::add_redbox_package (
       require => [
         Puppet_common::Add_directory[$packages[install_directory]],
         Puppet_redbox::Pre_upgrade_backup[$packages[install_directory]]],
-      before  => [
-        Package[$redbox_package],
-        Puppet_redbox::Move_and_link_directory[$link_targets],
-        Puppet_redbox::Move_and_link_directory["${redbox_system}/home/logs"]],
+      before  => [Package[$redbox_package]],
     }
   }
 
@@ -46,12 +43,10 @@ define puppet_redbox::add_redbox_package (
     if ($packages[institutional_build]) {
       $before_post_install_list = [
         Puppet_redbox::Institutional_build::Overlay[$packages[institutional_build]],
-        Puppet_redbox::Move_and_link_directory[$link_targets],
-        Puppet_redbox::Move_and_link_directory["${redbox_system}/home/logs"]]
+        Puppet_redbox::Move_and_link_all[$redbox_system],
+        ]
     } else {
-      $before_post_install_list = [
-        Puppet_redbox::Move_and_link_directory[$link_targets],
-        Puppet_redbox::Move_and_link_directory["${redbox_system}/home/logs"]]
+#      $before_post_install_list = [Puppet_redbox::Move_and_link_all[$redbox_system]]
     }
 
     package { $packages[post_install]:
@@ -104,6 +99,7 @@ define puppet_redbox::add_redbox_package (
     has_ssl    => $has_ssl,
     server_url => $server_url,
     notify     => Exec["${redbox_system}-restart_on_refresh"],
+#    before     => Puppet_redbox::Move_and_link_all[$redbox_system],
     subscribe  => Package[$redbox_package],
   }
 
@@ -115,6 +111,7 @@ define puppet_redbox::add_redbox_package (
       system_install_directory => $packages[install_directory],
       notify                   => [Service[$redbox_system]],
       require                  => $require_list,
+#      before                   => Puppet_redbox::Move_and_link_all[$redbox_system],
     }
   }
 
@@ -139,37 +136,12 @@ define puppet_redbox::add_redbox_package (
   #  mint is not always proxied
   if ($redbox_system == 'mint' and $proxy and !empty(grep([join($proxy, ',')], 'http://localhost:9001/mint'))) {
     puppet_redbox::prime_system { 'localhost:9001/mint':
-      subscribe => [
-        Exec["${redbox_system}-restart_on_refresh"],
-        Service[$redbox_system]],
+      subscribe => [Exec["${redbox_system}-restart_on_refresh"], Service[$redbox_system]],
     }
   } else {
-    puppet_redbox::prime_system { $server_url: subscribe => [
-        Exec["${redbox_system}-restart_on_refresh"],
-        Service[$redbox_system]], }
-  }
-
-  puppet_redbox::add_tidy { $redbox_system: require => Service[$redbox_system], } ->
-  puppet_redbox::move_and_link_directory { $link_targets:
-    target_parent => '/opt',
-    relocation    => '/mnt/data',
-    owner         => $owner,
-    system        => $redbox_system,
-    require       => Service[$redbox_system],
-  } ->
-  puppet_redbox::move_and_link_directory { "${redbox_system}/home/logs":
-    target_parent => '/opt',
-    relocation    => '/mnt/logs',
-    owner         => $owner,
-    system        => $redbox_system,
-    require       => Service[$redbox_system],
-  }
-
-  file { "/var/log/${redbox_system}":
-    ensure  => link,
-    target  => "/mnt/logs/${redbox_system}",
-    require => Puppet_redbox::Move_and_link_directory["${redbox_system}/home/logs"],
-    owner   => $owner,
+    puppet_redbox::prime_system { $server_url:
+      subscribe => [Exec["${redbox_system}-restart_on_refresh"], Service[$redbox_system]],
+    }
   }
 
 }
