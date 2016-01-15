@@ -1,8 +1,6 @@
 require 'spec_helper'
 
 describe 'puppet_redbox' do
-  let!(:create_parent_directories) { MockFunction.new('create_parent_directories', {:type => :statement})
-    }
   shared_context "default facts" do
     let :facts do { 
       :fqdn => 'site.domain.com.au',
