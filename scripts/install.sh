@@ -17,13 +17,11 @@ export PUPPET_VERSION=3.8.4
 
 ## remove existing installation
 reset() {
- log_function $FUNCNAME
  yum remove -y ruby facter puppet libyaml
 }
 
 ## install ruby installer, rvm
 install_ruby() {
- log_function $FUNCNAME
  gpg2 --keyserver hkp://keys.gnupg.net --recv-keys D39DC0E3
  curl -L get.rvm.io | bash -s stable
  /usr/local/rvm/bin/rvm pkg install zlib
