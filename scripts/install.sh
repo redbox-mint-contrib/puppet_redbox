@@ -44,6 +44,7 @@ install_ruby
 [[ -s /usr/local/rvm/scripts/rvm ]] && source /usr/local/rvm/scripts/rvm
 rvm use ${RUBY_VERSION} --default
 install_puppet
+test -h /usr/bin/puppet || ln -s `which puppet` /usr/bin/puppet
 touch $LOG_DEST
 
 # Install Basic Puppet Modules
