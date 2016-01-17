@@ -42,11 +42,8 @@ define puppet_redbox::add_redbox_package (
   if ($packages[post_install]) {
     if ($packages[institutional_build]) {
       $before_post_install_list = [
-        Puppet_redbox::Institutional_build::Overlay[$packages[institutional_build]],
-        Puppet_redbox::Move_and_link_all[$redbox_system],
+        Puppet_redbox::Institutional_build::Overlay[$packages[institutional_build]]
         ]
-    } else {
-#      $before_post_install_list = [Puppet_redbox::Move_and_link_all[$redbox_system]]
     }
 
     package { $packages[post_install]:
