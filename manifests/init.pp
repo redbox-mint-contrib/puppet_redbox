@@ -173,12 +173,12 @@ class puppet_redbox (
     proxy           => $proxy,
     require         => [Puppet_common::Add_systemuser[$redbox_user], Class['Puppet_common::Java']],
   }
-  ->
-  file { [$relocation_data_dir, $relocation_logs_dir]:
-    owner   => $redbox_user,
-    recurse => true,
-  } ->
-  puppet_redbox::move_and_link_all { [values($packages)]: owner => $redbox_user, }
+#  ->
+#  file { [$relocation_data_dir, $relocation_logs_dir]:
+#    owner   => $redbox_user,
+#    recurse => true,
+#  } ->
+#  puppet_redbox::move_and_link_all { [values($packages)]: owner => $redbox_user, }
 
   if ($crontab) {
     puppet_common::add_cron { $crontab: cron_path => join($exec_path, ':'), }

@@ -44,5 +44,7 @@ define puppet_redbox::pre_upgrade_backup (
     }
 
     exec { "restart ${system_name} after backup": command => "service ${system_name} restart || echo 'service not running'", }
+  } else {
+    notify { "Skipping backup for ${backup_source} as NOT required in environment: ${::environment}": }
   }
 }

@@ -17,29 +17,13 @@ define puppet_redbox::move_and_link_directory (
     $source_target = $target
   }
   include 'puppet_common'
+
   create_parent_directories($relocation_target)
+  notify { "${target_parent} a for ${target}": message => $target_parent } ->
+  notify { "${relocation} a for ${target}": message => $relocation_target } ->
+  notify { "${source_target} a for ${target}": message => $relocation_target } ->
+  exec { "cp -pRf ${source_target}/* ${relocation_target}/": unless => "test -h ${source_target}", } ->
+  exec { "rm -Rf ${source_target}": unless => "test -h ${source_target}", } ->
+  exec { "ln -sf ${relocation_target} ${source_target}": unless => "test -h ${source_target}", }
 
-  #  copy recursively
-  exec { "cp -pRf ${source_target}/* ${relocation_target}/ && rm -Rf ${source_target} && ln -s ${relocation_target} ${source_target}"
-  :
-    unless => "test -h ${source_target}",
-    onlyif => "test -d ${source_target} && test -d ${relocation_target}",
-  }
-
-  #  file { $relocation_target:
-  #    ensure             => present,
-  #    recurse            => true,
-  #    source             => $source_target,
-  #    validate_cmd       => "test -d ${source_target}",
-  #    source_permissions => use_when_creating,
-  #  }
-
-  # link back in original
-  #  file { $source_target:
-  #    ensure       => link,
-  #    force        => true,
-  #    validate_cmd => "test -d ${source_target}",
-  #    target       => $relocation_target,
-  #    require      => File[$relocation_target],
-  #  }
 }

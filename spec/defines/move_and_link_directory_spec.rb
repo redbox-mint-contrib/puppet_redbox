@@ -24,27 +24,14 @@ describe 'puppet_redbox::move_and_link_directory' do
 
     it {should compile.with_all_deps}
     it "has a known and consistent number of resources" do
-      should have_resource_count(3)
+      should have_resource_count(2)
 
       # file should 1. ensure destination 2. link back to original
-      should have_file_resource_count(2)
+      should have_exec_resource_count(1)
     end
 
     it do
-      should contain_file('/mnt/data/redbox/storage').with({
-        :ensure => 'present',
-        :recurse => 'true',
-        :source => '/opt/redbox/storage',
-        :validate_cmd => "test -d /opt/redbox/storage",
-        :source_permissions => 'use_when_creating',
-      })
-
-      should contain_file('/opt/redbox/storage').with({
-        :ensure => 'link',
-        :force => 'true',
-        :validate_cmd => "test -d /opt/redbox/storage",
-        :target => '/mnt/data/redbox/storage'
-      }).that_requires('File[/mnt/data/redbox/storage]')
+      should contain_exec("cp -pRf /opt/redbox/storage/* /mnt/data/redbox/storage/ && rm -Rf /opt/redbox/storage && ln -s /mnt/data/redbox/storage /opt/redbox/storage")
     end
   end
 end

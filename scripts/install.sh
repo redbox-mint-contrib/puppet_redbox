@@ -10,6 +10,7 @@ usage() {
 usage
 
 export LOG_DEST=/var/log/puppet/puppet.log
+mkdir -p /var/log/puppet
 
 # Install Puppet
 export RUBY_VERSION=2.0.0
