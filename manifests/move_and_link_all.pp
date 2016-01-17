@@ -16,34 +16,26 @@ define puppet_redbox::move_and_link_all (
     recurse => true,
   }
 
-  file { "${relocation_logs_dir}/${system}":
-    owner   => $owner,
-    recurse => true,
-  }
-
   file { "${relocation_data_dir}/${system}/home":
     owner   => $owner,
     recurse => true,
     require => File["${relocation_data_dir}/${system}"],
-    notify  => [
-      Puppet_redbox::Move_and_link_directory[$link_data_targets],
-      Puppet_redbox::Move_and_link_directory["${target_parent}/${system}/home/logs"]],
   }
 
   puppet_redbox::move_and_link_directory { $link_data_targets:
     target_parent => $target_parent,
     relocation    => $relocation_data_dir,
     owner         => $owner,
-    require       => [Exec["stop ${system} before tidy/move/link"], File["${relocation_data_dir}/${system}"]]
+    require       => [
+      Exec["stop ${system} before tidy/move/link"],
+      File["${relocation_data_dir}/${system}"],
+      File["${relocation_data_dir}/${system}/home"]]
   }
 
   puppet_redbox::move_and_link_directory { "${target_parent}/${system}/home/logs":
     relocation => "${relocation_logs_dir}/${system}",
     owner      => $owner,
-    require    => [
-      Puppet_redbox::Add_tidy[$system],
-      Exec["stop ${system} before tidy/move/link"],
-      File["${relocation_logs_dir}/${system}"]],
+    require    => [Puppet_redbox::Add_tidy[$system], Exec["stop ${system} before tidy/move/link"]],
   }
 
   file { "/var/log/${system}":

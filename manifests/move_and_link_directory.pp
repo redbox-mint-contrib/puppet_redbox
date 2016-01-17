@@ -22,8 +22,17 @@ define puppet_redbox::move_and_link_directory (
   notify { "${target_parent} a for ${target}": message => $target_parent } ->
   notify { "${relocation} a for ${target}": message => $relocation_target } ->
   notify { "${source_target} a for ${target}": message => $relocation_target } ->
+  file { $relocation_target:
+    ensure => directory,
+    owner  => $owner,
+  } ->
   exec { "cp -pRf ${source_target}/* ${relocation_target}/": unless => "test -h ${source_target}", } ->
   exec { "rm -Rf ${source_target}": unless => "test -h ${source_target}", } ->
-  exec { "ln -sf ${relocation_target} ${source_target}": unless => "test -h ${source_target}", }
+  exec { "ln -sf ${relocation_target} ${source_target}": unless => "test -h ${source_target}", } -> file { $source_target:
+    ensure => link,
+    force  => true,
+    target => $relocation_target,
+    owner  => $owner,
+  }
 
 }
