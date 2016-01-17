@@ -19,9 +19,6 @@ define puppet_redbox::move_and_link_directory (
   include 'puppet_common'
 
   create_parent_directories($relocation_target)
-  notify { "${target_parent} a for ${target}": message => $target_parent } ->
-  notify { "${relocation} a for ${target}": message => $relocation_target } ->
-  notify { "${source_target} a for ${target}": message => $relocation_target } ->
   file { $relocation_target:
     ensure => directory,
     owner  => $owner,

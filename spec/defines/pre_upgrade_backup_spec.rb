@@ -85,7 +85,8 @@ describe 'puppet_redbox::pre_upgrade_backup' do
     it {should compile.with_all_deps}
 
     it "has a known and consistent number of resources" do
-      should have_resource_count(1)
+      should have_resource_count(2)
+      should have_notify_resource_count(1)
 
       should have_puppet_redbox__pre_upgrade_backup_resource_count(1)
 
