@@ -13,7 +13,7 @@ export LOG_DEST=/var/log/puppet/puppet.log
 mkdir -p /var/log/puppet
 
 # Install Puppet
-export RUBY_VERSION=2.0.0
+export RUBY_VERSION=2.0.0-p598
 export PUPPET_VERSION=3.8.4
 
 ## remove existing installation
