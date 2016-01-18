@@ -4,11 +4,12 @@ define puppet_redbox::institutional_build::overlay (
   $revision                 = 'master',
   $system_install_directory = undef,
   $local_repo_parent        = '/tmp',) {
+  ## required for basename function - as not yet at latest stdlib library.
+  include 'puppet_common'
   validate_absolute_path($local_repo_parent)
 
   if ($system_install_directory == undef) {
-    fail('You must specify a system install directory to where the institutional build is to be copied.'
-    )
+    fail('You must specify a system install directory to where the institutional build is to be copied.')
   }
   $git_base_name = basename($git_clone_url)
 
