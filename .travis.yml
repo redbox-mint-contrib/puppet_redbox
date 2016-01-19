@@ -4,7 +4,8 @@ rvm:
  - "2.0.0-p598"
  - "2.0.0"
  - "2.1.4"
-script: bundle exec rake spec
 env:
  - PUPPET_VERSION="3.8.4"
-task: default => [:spec, :lint]
+script:
+ - rake spec
+ - rake lint
