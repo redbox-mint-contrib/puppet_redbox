@@ -7,4 +7,4 @@ rvm:
 # uncomment this line if your project needs to run something other than `rake`:
 # script: bundle exec rspec spec
 env:
- - PUPPET_VERSION="~> 3.8.4"
+ - PUPPET_VERSION="3.8.4"
