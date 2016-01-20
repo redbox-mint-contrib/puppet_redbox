@@ -16,6 +16,9 @@ RSpec.configure do |c|
   c.formatter = :documentation
 
   # Configure all nodes in nodeset
-#  c.before :suite do
-#  end
+  c.before :suite do
+    hosts.each do |host|
+      on host, shell('/bin/bash --login')
+    end
+  end
 end
