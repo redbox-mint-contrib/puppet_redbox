@@ -21,7 +21,7 @@ end
 
 describe 'puppet_redbox basic install' do
   it 'should install ruby, puppet and puppet_rebox without errors' do
-    shell_result = shell("/tmp/install.sh")
+    shell_result = shell("bash -l -c '/tmp/install.sh'")
     expect(shell_result.exit_code).to eq 0
   end
   it 'should show ruby version' do
