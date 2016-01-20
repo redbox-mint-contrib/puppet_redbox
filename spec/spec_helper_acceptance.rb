@@ -20,12 +20,5 @@ RSpec.configure do |c|
 
   # Configure all nodes in nodeset
   c.before :suite do
-    # Install module and dependencies
-    #    puppet_module_install(:source => proj_root, :module_name => 'puppet_redbox', :target_module_path => '/usr/share/puppet/modules')
-    #    hosts.each do |host|
-    #      # Needed for the consul module to download the binary per the modulefile
-    #      on host, puppet('module', 'install', 'puppetlabs-stdlib'), { :acceptable_exit_codes => [0,1] }
-    #      on host, puppet('module', 'install', 'puppetlabs/vcsrepo'), { :acceptable_exit_codes => [0,1] }
-    #    end
   end
 end
