@@ -26,3 +26,5 @@ chmod +x ${PUPPET_INSTALL_DIR}/install.sh
 ${PUPPET_INSTALL_DIR}/install.sh
 PUPPET_DIR=/etc/puppet
 mkdir -p /etc/puppet
+
+# redbox install
