@@ -17,7 +17,7 @@ export RUBY_VERSION=2.0.0-p598
 export PUPPET_VERSION=3.8.4
 
 # grab tool to download scripts
-yum -y install wget
+yum -y install wget which
 
 export PUPPET_INSTALL_DIR=/tmp/ruby_puppet
 mkdir -p ${PUPPET_INSTALL_DIR}
