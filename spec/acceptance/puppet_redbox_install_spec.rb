@@ -17,6 +17,11 @@ describe 'puppet_redbox pre-install environment' do
     expect(shell_result.exit_code).to eq 0
     expect(shell_result.stdout).to match /install.sh/
   end
+  it 'should show ruby version' do
+      shell_result = shell("ruby --version")
+      expect(shell_result.exit_code).to eq 0
+      expect(shell_result.stdout).to match /ruby/
+    end
 end
 
 describe 'puppet_redbox basic install' do

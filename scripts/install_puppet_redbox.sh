@@ -9,6 +9,10 @@ usage() {
 }
 usage
 
+echo "running this script requires a ruby and puppet version set."
+echo `ruby --version`
+echo `puppet --version`
+
 export LOG_DEST=/var/log/puppet/puppet.log
 mkdir -p /var/log/puppet
 
