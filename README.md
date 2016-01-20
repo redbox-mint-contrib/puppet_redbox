@@ -19,6 +19,8 @@ sudo install.sh
 3. Test module.
 
 ```
+cd puppet_redbox
+sudo bundle install
 sudo rake spec
 ```
 ## Optional Features
