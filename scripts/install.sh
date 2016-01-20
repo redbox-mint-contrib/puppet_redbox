@@ -26,10 +26,3 @@ chmod +x ${PUPPET_INSTALL_DIR}/install.sh
 ${PUPPET_INSTALL_DIR}/install.sh
 PUPPET_DIR=/etc/puppet
 mkdir -p /etc/puppet
-
-# redbox install
-export REDBOX_INSTALL_DIR=/tmp/puppet_redbox
-mkdir -p ${REDBOX_INSTALL_DIR}
-wget -N -O ${REDBOX_INSTALL_DIR}/install.sh https://raw.githubusercontent.com/redbox-mint-contrib/puppet_redbox/master/scripts/install_puppet_redbox.sh 
-chmod +x ${REDBOX_INSTALL_DIR}/install.sh
-${REDBOX_INSTALL_DIR}/install.sh

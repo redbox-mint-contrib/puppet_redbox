@@ -24,11 +24,11 @@ describe 'puppet_redbox basic install' do
     shell_result = shell("/tmp/install.sh")
     expect(shell_result.exit_code).to eq 0
   end
-#  it 'should show ruby version' do
-#    shell_result = shell("ruby --version")
-#    expect(shell_result.exit_code).to eq 0
-#    expect(shell_result.stdout).to match /ruby/
-#  end
+  it 'should show ruby version' do
+    shell_result = shell("ruby --version")
+    expect(shell_result.exit_code).to eq 0
+    expect(shell_result.stdout).to match /ruby/
+  end
   #  it 'should show default environment is production' do
   #    shell_result = shell("puppet config print environment")
   #    expect(shell_result.exit_code).to eq 0
