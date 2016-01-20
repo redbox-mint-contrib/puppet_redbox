@@ -1,5 +1,15 @@
 HOSTS:
-  el-6.7-x86_64-agent:
+  centos6-64:
     roles:
       - agent
-    platform: el-6.7-x86_64
+    platform: el-6-x86_64
+    hypervisor: docker
+    image: centos:6.7
+#    docker_preserve_image: true
+#    ip: 127.0.0.1
+#    docker_image_commands:
+#      - export DOCKER_PORT=4243
+#      - export DOCKER_HOST=tcp://127.0.0.1:4243   
+CONFIG:
+#  type: foss
+  log_level: verbose
