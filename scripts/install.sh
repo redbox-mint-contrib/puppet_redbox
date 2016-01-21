@@ -21,6 +21,10 @@ yum -y install wget
 
 export PUPPET_INSTALL_DIR=/tmp/ruby_puppet
 mkdir -p ${PUPPET_INSTALL_DIR}
+
+#DEBUG
+#cp ../../ruby_puppet/Centos/install.sh ${PUPPET_INSTALL_DIR}/install.sh
+
 wget -N -O ${PUPPET_INSTALL_DIR}/install.sh https://raw.githubusercontent.com/redbox-mint-contrib/ruby_puppet/master/Centos/install.sh 
 chmod +x ${PUPPET_INSTALL_DIR}/install.sh
 ${PUPPET_INSTALL_DIR}/install.sh

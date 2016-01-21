@@ -20,10 +20,10 @@ describe 'puppet_redbox pre-install environment' do
 end
 
 describe 'puppet_redbox basic install' do
-  it 'should install ruby, puppet and puppet_rebox without errors' do
-    shell_result = shell("/tmp/install.sh")
-    expect(shell_result.exit_code).to eq 0
-  end
+#  it 'should install ruby, puppet and puppet_rebox without errors' do
+#    shell_result = shell("/tmp/install.sh")
+#    expect(shell_result.exit_code).to eq 0
+#  end
   it 'should show ruby version' do
     shell_result = shell("ruby --version")
     expect(shell_result.exit_code).to eq 0
