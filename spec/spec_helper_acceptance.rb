@@ -17,8 +17,8 @@ RSpec.configure do |c|
 
   # Configure all nodes in nodeset
   c.before :suite do
-    hosts.each do |host|
-      on host, shell('/bin/bash --login')
-    end
+#    hosts.each do |host|
+#      on host, shell('/bin/bash --login')
+#    end
   end
 end
