@@ -4,3 +4,4 @@ spec/fixtures/
 Gemfile.lock
 .vagrant/
 log/
+.DS_Store
