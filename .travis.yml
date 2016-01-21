@@ -5,8 +5,6 @@ rvm:
  - "2.0.0"
 sudo: required
 services:
-  - dockers
-services:
  - docker
 env:
  - PUPPET_VERSION="3.8.4"
