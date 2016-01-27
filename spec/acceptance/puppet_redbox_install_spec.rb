@@ -1,12 +1,6 @@
 require 'spec_helper_acceptance'
 
 describe 'puppet_redbox pre-install environment' do
-  #  it 'should install redbox with no errors' do
-  #    shell_result = shell("cd /usr/share/puppet/modules/puppet_redbox/scripts && install.sh")
-  #    expect(shell_result.exit_code).to eq 0
-  #    expect(shell_result.stdout).not_to match /Fail/
-  #    expect(shell_result.stdout).not_to match /err/
-  #  end
   it 'should output correct platform details' do
     shell_result = shell("cat /etc/redhat-release")
     expect(shell_result.exit_code).to eq 0
@@ -19,19 +13,46 @@ describe 'puppet_redbox pre-install environment' do
   end
 end
 
-describe 'puppet_redbox basic install' do
+describe 'ruby_puppet basic install' do
   it 'should show ruby version' do
     shell_result = shell("ruby --version")
     expect(shell_result.exit_code).to eq 0
     expect(shell_result.stdout).to match /ruby/
   end
   it 'should show gem version' do
-      shell_result = shell("gem --version")
-      expect(shell_result.exit_code).to eq 0
+    shell_result = shell("gem --version")
+    expect(shell_result.exit_code).to eq 0
+  end
+  it 'should show default environment is production' do
+    shell_result = shell("puppet config print environment")
+    expect(shell_result.exit_code).to eq 0
+    expect(shell_result.stdout).to match /production/
+  end
+end
+
+describe 'puppet_redbox basic install' do
+  it 'shows redbox installation' do
+    shell_result = shell("test -d /opt/redbox")
+    expect(shell_result.exit_code).to eq 0
+  end
+  it 'shows mint installation' do
+    shell_result = shell("test -d /opt/mint")
+    expect(shell_result.exit_code).to eq 0
+  end
+  it 'lists redbox and mint subdirectories' do
+    ['home', 'portal', 'server', 'solr', 'storage'].each do |subdirectory|
+      shell("test -d /opt/redbox/#{subdirectory}")
+      shell("test -d /opt/mint/#{subdirectory}")
     end
-  #  it 'should show default environment is production' do
-  #    shell_result = shell("puppet config print environment")
-  #    expect(shell_result.exit_code).to eq 0
-  #    expect(shell_result.stdout).to match /production/
-  #  end
+  end
+  it 'shows redbox and mint links' do
+    ['storage', 'solr', 'home/activemq-data', 'home/database'].each do |link|
+      ['redbox','mint'].each do |system|
+        shell("test -h /opt/#{system}/#{link}") do |result|
+          expect(result.exit_code).to eq 0
+          expect(result.stdout).to match /mnt\/data\/#{system}/
+        end
+      end
+    end
+  end
 end
