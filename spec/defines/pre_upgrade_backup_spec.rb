@@ -46,10 +46,14 @@ describe 'puppet_redbox::pre_upgrade_backup' do
       })
       should contain_exec('backup sources: /opt/redbox to: /tmp/backup_redbox').with({
         :command => "/usr/bin/rsync -rcvzh --filter='- storage' --filter='- solr' --filter='- logs' /opt/redbox /tmp/backup_redbox/"
-      }).that_requires('Exec[stop redbox before backup]').that_comes_before('Exec[restart redbox after backup]')
+      }).that_requires('Exec[stop redbox before backup]')
+        .that_requires('File[/tmp/backup_redbox]')
       should contain_exec('restart redbox after backup').with({
         :command => "service redbox restart || echo 'service not running'"
       })
+        .that_requires('Exec[stop redbox before backup]')
+        .that_requires('File[/tmp/backup_redbox]')
+        .that_requires('Exec[backup sources: /opt/redbox to: /tmp/backup_redbox]')
     end
   end
 
