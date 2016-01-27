@@ -1,0 +1,9 @@
+HOSTS:
+  centos7-64:
+    roles:
+      - agent
+    platform: el-7-x86_64
+    hypervisor: docker
+    image: centos:7.2.1511
+CONFIG:
+  log_level: verbose

@@ -12,6 +12,9 @@ fixtures:
     apache:
       repo: "puppetlabs/apache"
       ref: "1.1.1"
+    postgresql:
+      repo: "puppetlabs/postgresql"
+      ref: "3.3.3"
   repositories:
     puppet_common:
       repo: "git://github.com/redbox-mint-contrib/puppet_common"

@@ -39,15 +39,12 @@ define puppet_redbox::add_harvesters_complete (
   $mintcsvharvester_package_url = hiera(h_mintcsvharvester_package_url, 'http://dev.redboxresearchdata.com.au/nexus/service/local/artifact/maven/redirect?r=snapshots&g=au.com.redboxresearchdata&a=mint-csvjdbc-harvester&v=LATEST&e=zip&c=bin'
   ),
   $mintcsvharvester_id   = hiera(h_mintcsvharvester_id, 'mint-csvjdbc'),
-  $hm_url                = hiera(h_hm_url, 'http://localhost:8080/json-harvester-manager/harvester/'
-  ),
+  $hm_url                = hiera(h_hm_url, 'http://localhost:8080/json-harvester-manager/harvester/'),
   $oaiharvester_samplehelper    = hiera(h_oaiharvester_samplehelper, 'https://raw.githubusercontent.com/redbox-harvester/redbox-oai-feed/master/support/install/addSampleRecord.groovy'
   ),
-  $oaiserver_formats_url = hiera(h_oaiserver_formats_url, 'http://localhost/oai-server/?verb=ListMetadataFormats'
-  ),
+  $oaiserver_formats_url = hiera(h_oaiserver_formats_url, 'http://localhost/oai-server/?verb=ListMetadataFormats'),
   $groovy_version        = hiera(h_groovy_version, '2.2.2'),
-  $groovy_install_url    = hiera(h_groovy_install_url, 'http://dl.bintray.com/groovy/maven/groovy-binary-'
-  ),
+  $groovy_install_url    = hiera(h_groovy_install_url, 'http://dl.bintray.com/groovy/maven/groovy-binary-'),
   $groovy_install_dir    = hiera(h_groovy_install_dir, '/opt/groovy'),
   $logRotateConf         = hiera(h_logRotateConf, 'tomcatLogRotate'),
   $isReadyScript         = hiera(h_isReadyScript, 'isready.sh'),
@@ -147,8 +144,7 @@ define puppet_redbox::add_harvesters_complete (
   } -> file { "/home/tomcat/${oaiserver_workdir}":
     ensure => link,
     target => "${harvester_install_dir}${oaiserver_workdir}"
-  } -> exec { 'Download oai-server, json-harvester-manager and curation manager WAR files and other config files'
-  :
+  } -> exec { 'Download oai-server, json-harvester-manager and curation manager WAR files and other config files':
     cwd     => "${tomcat_install}/webapps/",
     command => "${wget_download_cmd} json-harvester-manager.war '${hm_war_url}' && ${wget_download_cmd} CurationManager.war '${cm_war_url}' && ${wget_download_cmd} oai-server.war '${oaiserver_war_url}'",
     path    => ['/usr/bin', '/usr/sbin', '/bin', '/sbin'],
@@ -244,9 +240,8 @@ define puppet_redbox::add_harvesters_complete (
     } -> file { '/home/tomcat':
       ensure => directory,
       owner  => 'tomcat',
-    } -> user { "Creating user '${mintHarvesterUser}'":
+    } -> user { $mintHarvesterUser:
       ensure => present,
-      name   => $mintHarvesterUser,
       gid    => 'tomcat',
     } -> file { "/home/${mintHarvesterUser}/":
       ensure => directory,
@@ -272,7 +267,7 @@ define puppet_redbox::add_harvesters_complete (
     } -> file { '/home/tomcat':
       ensure => directory,
       owner  => 'tomcat',
-    } -> user { "Creating user '${mintHarvesterUser}'":
+    } -> user { $mintHarvesterUser:
       ensure => present,
       name   => $mintHarvesterUser,
       gid    => 'tomcat',

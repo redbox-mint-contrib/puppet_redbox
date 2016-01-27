@@ -95,8 +95,6 @@ describe 'puppet_redbox' do
     let :params do
       default_params
     end
-
-  it {should compile.with_all_deps}
     
     it 'Given fqdn: site.domain.com.au' do
       should contain_host('site.domain.com.au')
@@ -166,5 +164,16 @@ describe 'puppet_redbox' do
       should contain_puppet_redbox__move_and_link_all(default_redbox_package_parameters).with({:owner =>default_redbox_user_parameter})
       should contain_puppet_redbox__move_and_link_all(default_mint_package_parameters).with({:owner =>default_redbox_user_parameter})
     }
+  end
+  context "Given default parameters for harvester-complete redbox installation on CentOS" do
+    include_context "default facts"
+    include_context "always should"
+    let :params do
+      default_params.merge({:install_type => 'harvester-complete'})
+    end
+    
+    it {
+      should contain_puppet_redbox__add_harvesters_complete('/opt/harvester/')
+    }   
   end
 end
