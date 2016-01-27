@@ -8,12 +8,17 @@ usage() {
 usage
 
 pkill -u redbox
-userdel -r redbox
+userdel -rf redbox
 
 rm -Rf /opt/deploy
 rm -Rf /opt/redbox
 rm -Rf /opt/mint
 
-yum erase java
-yum erase httpd
-yum erase redbox
+yum erase -y java
+yum erase -y httpd
+yum erase -y redbox
+
+## Uncomment below if also resetting ruby and puppet installation
+#rm -Rf /usr/local/rvm
+#rm -Rf /etc/puppet
+#rm -Rf /usr/share/puppet

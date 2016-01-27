@@ -111,8 +111,8 @@ class puppet_redbox (
   $crontab                  = hiera_hash(crontab, undef),
   $tf_env                   = hiera_hash(tf_env, undef),
   $system_config            = hiera_hash(system_config, undef),
-  $relocation_data_dir      = '/mnt/data',
-  $relocation_logs_dir      = '/mnt/logs') {
+  $relocation_data_dir      = hiera_hash(relocation_data_dir, '/mnt/data'),
+  $relocation_logs_dir      = hiera_hash(relocation_logs_dir, '/mnt/logs')) {
   if ($has_dns and $::fqdn) {
     $server_url = $::fqdn
   } elsif ($::ipaddress) {
@@ -172,8 +172,8 @@ class puppet_redbox (
     base_server_url => $server_url,
     proxy           => $proxy,
     require         => [Puppet_common::Add_systemuser[$redbox_user], Class['Puppet_common::Java']],
-  }
-  ->
+    exec_path       => $exec_path,
+  } ->
   file { [$relocation_data_dir, $relocation_logs_dir]:
     owner   => $redbox_user,
     recurse => true,

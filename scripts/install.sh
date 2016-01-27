@@ -24,9 +24,6 @@ yum -y install wget
 export PUPPET_INSTALL_DIR=/tmp/scripts/ruby_puppet
 mkdir -p ${PUPPET_INSTALL_DIR}
 
-#DEBUG
-#cp ../../ruby_puppet/Centos/install.sh ${PUPPET_INSTALL_DIR}/install.sh
-
 wget -N -O ${PUPPET_INSTALL_DIR}/install.sh https://raw.githubusercontent.com/redbox-mint-contrib/ruby_puppet/master/Centos/install.sh 
 chmod +x ${PUPPET_INSTALL_DIR}/install.sh
 ${PUPPET_INSTALL_DIR}/install.sh
@@ -34,12 +31,11 @@ PUPPET_DIR=/etc/puppet
 mkdir -p /etc/puppet
 
 ## redbox install ##
+## source ruby and puppet installations first
+source /root/.bashrc
 export REDBOX_INSTALL_DIR=/tmp/scripts/puppet_redbox
 mkdir -p ${REDBOX_INSTALL_DIR}
 
-#DEBUG
-#cp ./install_puppet_redbox.sh ${REDBOX_INSTALL_DIR}/install.sh
-
 wget -N -O ${REDBOX_INSTALL_DIR}/install.sh https://raw.githubusercontent.com/redbox-mint-contrib/puppet_redbox/master/scripts/install_puppet_redbox.sh 
 chmod +x ${REDBOX_INSTALL_DIR}/install.sh
-#${REDBOX_INSTALL_DIR}/install.sh
+${REDBOX_INSTALL_DIR}/install.sh

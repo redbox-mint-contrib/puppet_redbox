@@ -79,7 +79,14 @@ describe 'puppet_redbox' do
      :has_ssl => default_has_ssl_parameter,
      :redbox_user => default_redbox_user_parameter,
      :relocation_data_dir      => '/mnt/data',
-     :relocation_logs_dir      => '/mnt/logs'
+     :relocation_logs_dir      => '/mnt/logs',
+     :exec_path => [
+        '/usr/local/bin',
+        '/opt/local/bin',
+        '/usr/bin',
+        '/usr/sbin',
+        '/bin',
+        '/sbin']
   }
   end
   context "Given default parameters for standard redbox installation on CentOS" do

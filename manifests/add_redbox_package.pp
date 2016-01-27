@@ -7,8 +7,14 @@ define puppet_redbox::add_redbox_package (
   $system_config   = undef,
   $base_server_url = undef,
   $proxy           = undef,
-    $relocation_data_dir = '/mnt/data',
-  $relocation_logs_dir = '/mnt/logs') {
+  $exec_path       = undef,) {
+  if ($exec_path) {
+    Exec {
+      path      => $exec_path,
+      logoutput => false,
+    }
+  }
+
   if ($packages[server_url_context]) {
     $server_url = "${base_server_url}/${packages[server_url_context]}"
   } else {
@@ -28,7 +34,7 @@ define puppet_redbox::add_redbox_package (
     before      => Package[$redbox_package]
   }
 
-#  TODO : add test to ensure can install a version on fresh vm (no matter what latest in yum is),
+  #  TODO : add test to ensure can install a version on fresh vm (no matter what latest in yum is),
   # or show logged error if already running a redbox instance
   if ($packages[pre_install]) {
     package { $packages[pre_install]:
@@ -41,13 +47,11 @@ define puppet_redbox::add_redbox_package (
 
   if ($packages[post_install]) {
     if ($packages[institutional_build]) {
-      $before_post_install_list = [
-        Puppet_redbox::Institutional_build::Overlay[$packages[institutional_build]]
-        ]
+      $before_post_install_list = [Puppet_redbox::Institutional_build::Overlay[$packages[institutional_build]]]
     }
 
     package { $packages[post_install]:
-      require => Package[$redbox_package],
+      require => [Package[$redbox_package], Puppet_common::Add_directory[$packages[install_directory]]],
       before  => $before_post_install_list,
     }
   }
@@ -131,12 +135,14 @@ define puppet_redbox::add_redbox_package (
   #  mint is not always proxied
   if ($redbox_system == 'mint' and $proxy and !empty(grep([join($proxy, ',')], 'http://localhost:9001/mint'))) {
     puppet_redbox::prime_system { 'localhost:9001/mint':
-      subscribe => [Exec["${redbox_system}-restart_on_refresh"], Service[$redbox_system]],
+      subscribe => [
+        Exec["${redbox_system}-restart_on_refresh"],
+        Service[$redbox_system]],
     }
   } else {
-    puppet_redbox::prime_system { $server_url:
-      subscribe => [Exec["${redbox_system}-restart_on_refresh"], Service[$redbox_system]],
-    }
+    puppet_redbox::prime_system { $server_url: subscribe => [
+        Exec["${redbox_system}-restart_on_refresh"],
+        Service[$redbox_system]], }
   }
 
 }
