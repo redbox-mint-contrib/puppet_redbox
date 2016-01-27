@@ -41,18 +41,23 @@ describe 'puppet_redbox basic install' do
   end
   it 'lists redbox and mint subdirectories' do
     ['home', 'portal', 'server', 'solr', 'storage'].each do |subdirectory|
-      shell("test -d /opt/redbox/#{subdirectory}")
-      shell("test -d /opt/mint/#{subdirectory}")
+      ['redbox','mint'].each do |system|
+        shell("test -d /opt/#{system}/#{subdirectory}")
+      end
     end
   end
   it 'shows redbox and mint links' do
     ['storage', 'solr', 'home/activemq-data', 'home/database'].each do |link|
       ['redbox','mint'].each do |system|
-        shell("test -h /opt/#{system}/#{link}") do |result|
-          expect(result.exit_code).to eq 0
-          expect(result.stdout).to match /mnt\/data\/#{system}/
-        end
+        shell("test -h /opt/#{system}/#{link}")
       end
+    end
+  end
+  it 'shows redbox and mint services' do
+    ['redbox','mint'].each do |system|
+      shell_result = shell("service #{system} status")
+      expect(shell_result.exit_code).to eq 0
+      expect(shell_result.stdout).to match /is running/
     end
   end
 end
