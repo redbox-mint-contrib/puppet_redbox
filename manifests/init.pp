@@ -178,7 +178,10 @@ class puppet_redbox (
     owner   => $redbox_user,
     recurse => true,
   } ->
-  puppet_redbox::move_and_link_all { [values($packages)]: owner => $redbox_user, }
+  puppet_redbox::move_and_link_all { [values($packages)]:
+    owner     => $redbox_user,
+    exec_path => $exec_path,
+  }
 
   if ($crontab) {
     puppet_common::add_cron { $crontab: cron_path => join($exec_path, ':'), }

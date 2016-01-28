@@ -23,7 +23,8 @@ class puppet_redbox::archive::deploy_script (
     order   => '01',
   }
 
-  puppet_redbox::archive::deploy_archive { [values($archives)]: deploy_script_path => $deploy_script_path, } ->
+  $archive_values = values($archives)
+  puppet_redbox::archive::deploy_archive { $archive_values: deploy_script_path => $deploy_script_path, } ->
   exec { $deploy_script_path:
     cwd       => $working_directory,
     user      => $owner,

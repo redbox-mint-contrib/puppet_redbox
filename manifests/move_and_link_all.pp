@@ -3,7 +3,14 @@ define puppet_redbox::move_and_link_all (
   $target_parent       = '/opt',
   $owner               = undef,
   $relocation_data_dir = '/mnt/data',
-  $relocation_logs_dir = '/mnt/logs') {
+  $relocation_logs_dir = '/mnt/logs',
+  $exec_path           = undef,) {
+  if ($exec_path) {
+    Exec {
+      path      => $exec_path,
+      logoutput => false,
+    }
+  }
   $system = $packages[system]
   $link_data_targets = prefix(['storage', 'solr', 'home/database', 'home/activemq-data'], "${system}/")
 

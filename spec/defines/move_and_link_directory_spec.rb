@@ -3,23 +3,19 @@ require 'spec_helper'
 describe 'puppet_redbox::move_and_link_directory' do
   let!(:create_parent_directories) { MockFunction.new('create_parent_directories', {:type => :statement})
   }
-  shared_context "stubbed params" do
-    let (:title) {'redbox/storage'}
-  end
-
+  
   let :default_params do
     {
       :target => title,
-      :target_parent => '/opt',
       :relocation => '/mnt/data',
       :owner => 'redbox'
     }
   end
 
-  context "Given default parameters" do
-    include_context "stubbed params"
+  context "Given default parameters for redbox/storage" do
+    let (:title) {'redbox/storage'}
     let :params do
-      default_params
+      default_params.merge({:target_parent => '/opt'})
     end
 
     it {should compile.with_all_deps}
@@ -60,4 +56,51 @@ describe 'puppet_redbox::move_and_link_directory' do
 
     end
   end
+  
+  context "Given default parameters for /opt/redbox/home/logs" do
+      let (:title) {'/opt/redbox/home/logs'}
+      let :params do
+        default_params.merge({:relocation => '/mnt/logs/redbox'})
+      end
+  
+      it {should compile.with_all_deps}
+      it "has a known and consistent number of resources" do
+        should have_resource_count(6)
+  
+        # file should 1. ensure destination 2. link back to original
+        should have_exec_resource_count(3)
+        should have_file_resource_count(2)
+      end
+  
+      it do
+        should contain_file('/mnt/logs/redbox').with({
+          :ensure => 'directory',
+          :owner => 'redbox',
+          :recurse => 'true',
+        }).that_comes_before('Exec[cp -pRf /opt/redbox/home/logs/* /mnt/logs/redbox/]')
+  
+        should contain_exec('cp -pRf /opt/redbox/home/logs/* /mnt/logs/redbox/').with({
+          :unless => 'test -h /opt/redbox/home/logs'
+        }).that_comes_before('Exec[rm -Rf /opt/redbox/home/logs]')
+        .that_requires('File[/mnt/logs/redbox]')
+  
+        should contain_exec('rm -Rf /opt/redbox/home/logs').with({
+          :unless => 'test -h /opt/redbox/home/logs'
+        }).that_comes_before('Exec[ln -sf /mnt/logs/redbox /opt/redbox/home/logs]')
+        .that_requires('Exec[cp -pRf /opt/redbox/home/logs/* /mnt/logs/redbox/]')
+  
+        should contain_exec('ln -sf /mnt/logs/redbox /opt/redbox/home/logs').with({
+          :unless => 'test -h /opt/redbox/home/logs'
+        }).that_comes_before('File[/opt/redbox/home/logs]')
+        .that_requires('Exec[rm -Rf /opt/redbox/home/logs]')
+  
+        should contain_file('/opt/redbox/home/logs').with({
+          :ensure => 'link',
+          :owner => 'redbox',
+          :force => 'true',
+          :recurse => 'true',
+          :target => '/mnt/logs/redbox'}).that_requires('Exec[ln -sf /mnt/logs/redbox /opt/redbox/home/logs]')
+  
+      end
+    end
 end
