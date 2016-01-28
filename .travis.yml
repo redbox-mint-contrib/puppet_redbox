@@ -9,6 +9,7 @@ services:
 env:
  - PUPPET_VERSION="3.8.4"
 script:
- - rake spec
+ - rake validate
  - rake lint
+ - rake spec_coverage
  - rake beaker

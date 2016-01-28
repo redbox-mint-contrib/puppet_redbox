@@ -1,12 +1,14 @@
 # `bundle install` to setup requirements to run puppet and/or tests
 source 'https://rubygems.org'
 
-puppetversion = ENV.key?('PUPPET_VERSION') ? "= #{ENV['PUPPET_VERSION']}" : ['>= 3.8']
+puppetversion = ENV.key?('PUPPET_VERSION') ? "= #{ENV['PUPPET_VERSION']}" : ['= 3.8.4']
 gem 'puppet', puppetversion
 gem 'facter', '>=2.2.6', 					:require => false
+
+# code style
 gem 'puppet-lint', '>=0.3.2', 				:require => false
 
-# unit testing
+# unit testing and coverage
 gem 'puppetlabs_spec_helper', '>=0.1.0', 	:require => false
 gem 'rspec-puppet-utils', '>=2.0.0', 		:require => false
 

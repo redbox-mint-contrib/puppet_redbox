@@ -5,3 +5,5 @@ Gemfile.lock
 .vagrant/
 log/
 .DS_Store
+coverage/
+junit/
