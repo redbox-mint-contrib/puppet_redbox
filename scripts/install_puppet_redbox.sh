@@ -35,6 +35,7 @@ install_git_module() {
     git_owner=redbox-mint-contrib
     echo "installing module: $1"
     # Pull down ReDBox Puppet configuration
+    rm -Rf /tmp/$1
     git clone https://github.com/$git_owner/$1.git /tmp/$1 && rm -Rf /tmp/$1/.git*
     
     # Double check if we have the Puppet configuration
@@ -84,9 +85,10 @@ fi
 puppet apply -e "class {'puppet_redbox': install_type=>'$INSTALL_TYPE'}" | tee ${LOG_DEST}
 
 # ReDBox admin is part of the default install
+rm -Rf /usr/share/puppet/modules/puppet_redbox_admin
 git clone https://github.com/redbox-mint-contrib/puppet_redbox_admin.git /usr/share/puppet/modules/puppet_redbox_admin
 wget -O /etc/yum.repos.d/elasticsearch.repo https://raw.githubusercontent.com/redbox-mint-contrib/puppet_redbox_admin/master/support/elasticsearch.repo
-puppet module install elasticsearch-elasticsearch --version 0.4.0
-puppet module install elasticsearch-logstash --version 0.5.1
-puppet module install maestrodev-wget --version 1.5.6
+puppet module install --force elasticsearch-elasticsearch --version 0.4.0
+puppet module install --force elasticsearch-logstash --version 0.5.1
+puppet module install --force maestrodev-wget --version 1.5.6
 puppet apply -e "class {'puppet_redbox_admin':}" | tee ${LOG_DEST} 

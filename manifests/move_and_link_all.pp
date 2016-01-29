@@ -38,7 +38,7 @@ define puppet_redbox::move_and_link_all (
       File["${relocation_data_dir}/${system}"],
       File["${relocation_data_dir}/${system}/home"]]
   }
-
+  
   puppet_redbox::move_and_link_directory { "${target_parent}/${system}/home/logs":
     relocation => "${relocation_logs_dir}/${system}",
     owner      => $owner,
