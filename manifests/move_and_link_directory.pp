@@ -20,18 +20,15 @@ define puppet_redbox::move_and_link_directory (
 
   create_parent_directories($relocation_target)
   file { $relocation_target:
-    ensure  => directory,
-    owner   => $owner,
-    recurse => true,
+    ensure => directory,
+    owner  => $owner,
   } ->
   exec { "cp -pRf ${source_target}/* ${relocation_target}/": unless => "test -h ${source_target}", } ->
-  exec { "rm -Rf ${source_target}": unless => "test -h ${source_target}", } ->
-  exec { "ln -sf ${relocation_target} ${source_target}": unless => "test -h ${source_target}", } -> file { $source_target:
-    ensure  => link,
-    recurse => true,
-    force   => true,
-    target  => $relocation_target,
-    owner   => $owner,
+  exec { "rm -Rf ${source_target} && ln -sf ${relocation_target} ${source_target}": unless => "test -h ${source_target}", } -> file { $source_target:
+    ensure => link,
+    force  => true,
+    target => $relocation_target,
+    owner  => $owner,
   }
 
 }
