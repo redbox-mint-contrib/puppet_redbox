@@ -53,6 +53,13 @@ describe 'puppet_redbox basic install' do
       end
     end
   end
+  it 'shows redbox and mint log links' do
+    ['home/logs'].each do |link|
+      ['redbox','mint'].each do |system|
+        shell("test -h /opt/#{system}/#{link}")
+      end
+    end
+  end
   it 'shows redbox and mint services' do
     ['redbox','mint'].each do |system|
       shell_result = shell("service #{system} status")
