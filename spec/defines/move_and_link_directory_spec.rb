@@ -20,10 +20,10 @@ describe 'puppet_redbox::move_and_link_directory' do
 
     it {should compile.with_all_deps}
     it "has a known and consistent number of resources" do
-      should have_resource_count(6)
+      should have_resource_count(5)
 
       # file should 1. ensure destination 2. link back to original
-      should have_exec_resource_count(3)
+      should have_exec_resource_count(2)
       should have_file_resource_count(2)
     end
 
@@ -35,24 +35,20 @@ describe 'puppet_redbox::move_and_link_directory' do
 
       should contain_exec('cp -pRf /opt/redbox/storage/* /mnt/data/redbox/storage/').with({
         :unless => 'test -h /opt/redbox/storage'
-      }).that_comes_before('Exec[rm -Rf /opt/redbox/storage]')
+      }).that_comes_before('Exec[rm -Rf /opt/redbox/storage && ln -sf /mnt/data/redbox/storage /opt/redbox/storage]')
       .that_requires('File[/mnt/data/redbox/storage]')
 
-      should contain_exec('rm -Rf /opt/redbox/storage').with({
+      should contain_exec('rm -Rf /opt/redbox/storage && ln -sf /mnt/data/redbox/storage /opt/redbox/storage').with({
         :unless => 'test -h /opt/redbox/storage'
-      }).that_comes_before('Exec[ln -sf /mnt/data/redbox/storage /opt/redbox/storage]')
+      })
       .that_requires('Exec[cp -pRf /opt/redbox/storage/* /mnt/data/redbox/storage/]')
-
-      should contain_exec('ln -sf /mnt/data/redbox/storage /opt/redbox/storage').with({
-        :unless => 'test -h /opt/redbox/storage'
-      }).that_comes_before('File[/opt/redbox/storage]')
-      .that_requires('Exec[rm -Rf /opt/redbox/storage]')
+      .that_comes_before('File[/opt/redbox/storage]')
 
       should contain_file('/opt/redbox/storage').with({
         :ensure => 'link',
         :owner => 'redbox',
         :force => 'true',
-        :target => '/mnt/data/redbox/storage'}).that_requires('Exec[ln -sf /mnt/data/redbox/storage /opt/redbox/storage]')
+        :target => '/mnt/data/redbox/storage'}).that_requires('Exec[rm -Rf /opt/redbox/storage && ln -sf /mnt/data/redbox/storage /opt/redbox/storage]')
 
     end
   end
@@ -65,10 +61,10 @@ describe 'puppet_redbox::move_and_link_directory' do
   
       it {should compile.with_all_deps}
       it "has a known and consistent number of resources" do
-        should have_resource_count(6)
+        should have_resource_count(5)
   
         # file should 1. ensure destination 2. link back to original
-        should have_exec_resource_count(3)
+        should have_exec_resource_count(2)
         should have_file_resource_count(2)
       end
   
@@ -76,30 +72,24 @@ describe 'puppet_redbox::move_and_link_directory' do
         should contain_file('/mnt/logs/redbox').with({
           :ensure => 'directory',
           :owner => 'redbox',
-          :recurse => 'true',
         }).that_comes_before('Exec[cp -pRf /opt/redbox/home/logs/* /mnt/logs/redbox/]')
   
         should contain_exec('cp -pRf /opt/redbox/home/logs/* /mnt/logs/redbox/').with({
           :unless => 'test -h /opt/redbox/home/logs'
-        }).that_comes_before('Exec[rm -Rf /opt/redbox/home/logs]')
+        }).that_comes_before('Exec[rm -Rf /opt/redbox/home/logs && ln -sf /mnt/logs/redbox /opt/redbox/home/logs]')
         .that_requires('File[/mnt/logs/redbox]')
   
-        should contain_exec('rm -Rf /opt/redbox/home/logs').with({
+        should contain_exec('rm -Rf /opt/redbox/home/logs && ln -sf /mnt/logs/redbox /opt/redbox/home/logs').with({
           :unless => 'test -h /opt/redbox/home/logs'
-        }).that_comes_before('Exec[ln -sf /mnt/logs/redbox /opt/redbox/home/logs]')
+        })
         .that_requires('Exec[cp -pRf /opt/redbox/home/logs/* /mnt/logs/redbox/]')
-  
-        should contain_exec('ln -sf /mnt/logs/redbox /opt/redbox/home/logs').with({
-          :unless => 'test -h /opt/redbox/home/logs'
-        }).that_comes_before('File[/opt/redbox/home/logs]')
-        .that_requires('Exec[rm -Rf /opt/redbox/home/logs]')
+        .that_comes_before('File[/opt/redbox/home/logs]')
   
         should contain_file('/opt/redbox/home/logs').with({
           :ensure => 'link',
           :owner => 'redbox',
           :force => 'true',
-          :recurse => 'true',
-          :target => '/mnt/logs/redbox'}).that_requires('Exec[ln -sf /mnt/logs/redbox /opt/redbox/home/logs]')
+          :target => '/mnt/logs/redbox'}).that_requires('Exec[rm -Rf /opt/redbox/home/logs && ln -sf /mnt/logs/redbox /opt/redbox/home/logs]')
   
       end
     end
