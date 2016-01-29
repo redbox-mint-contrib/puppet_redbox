@@ -56,7 +56,7 @@ describe 'puppet_redbox basic install' do
   it 'shows redbox and mint log links' do
     ['home/logs'].each do |link|
       ['redbox','mint'].each do |system|
-        shell("test -h /opt/#{system}/#{link}")
+        shell("ls -l /opt/#{system}/#{link} && test -h /opt/#{system}/#{link}")
       end
     end
   end
