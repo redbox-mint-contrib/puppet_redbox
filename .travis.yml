@@ -12,4 +12,4 @@ script:
  - rake validate
  - rake lint
  - rake spec_coverage
- - travis_wait rake beaker
+ - rake beaker
