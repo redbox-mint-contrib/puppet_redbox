@@ -91,4 +91,5 @@ wget -O /etc/yum.repos.d/elasticsearch.repo https://raw.githubusercontent.com/re
 puppet module install --force elasticsearch-elasticsearch --version 0.4.0
 puppet module install --force elasticsearch-logstash --version 0.5.1
 puppet module install --force maestrodev-wget --version 1.5.6
+puppet module install --force ispavailability-file_concat --version 0.1.0
 puppet apply -e "class {'puppet_redbox_admin':}" | tee ${LOG_DEST} 
