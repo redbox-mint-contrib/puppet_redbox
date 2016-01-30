@@ -10,10 +10,8 @@ env:
   global:
     - PUPPET_VERSION="3.8.4"
   matrix:
-    - TEST_SUITE="rake validate"
-    - TEST_SUITE="rake lint"
-    - TEST_SUITE="rake spec_coverage"
-    - TEST_SUITE="export BEAKER_set='default'; rake beaker"
-    - TEST_SUITE="export BEAKER_set='centos7-64'; rake beaker"
+    - TEST_SUITE="rake validate && rake lint && rake spec_coverage"
+    - TEST_SUITE="BEAKER_set=default && rake beaker"
+    - TEST_SUITE="BEAKER_set=centos7-64 && rake beaker"
 script:
  - $TEST_SUITE
