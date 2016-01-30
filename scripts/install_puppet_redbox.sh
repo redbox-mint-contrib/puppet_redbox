@@ -88,8 +88,10 @@ puppet apply -e "class {'puppet_redbox': install_type=>'$INSTALL_TYPE'}" | tee $
 rm -Rf /usr/share/puppet/modules/puppet_redbox_admin
 git clone https://github.com/redbox-mint-contrib/puppet_redbox_admin.git /usr/share/puppet/modules/puppet_redbox_admin
 wget -O /etc/yum.repos.d/elasticsearch.repo https://raw.githubusercontent.com/redbox-mint-contrib/puppet_redbox_admin/master/support/elasticsearch.repo
-puppet module install --force elasticsearch-elasticsearch --version 0.4.0
+puppet module install --force elasticsearch-elasticsearch --version 0.10.2
 puppet module install --force elasticsearch-logstash --version 0.5.1
-puppet module install --force maestrodev-wget --version 1.5.6
-puppet module install --force ispavailability-file_concat --version 0.1.0
+puppet module install --force maestrodev-wget --version 1.7.1
+puppet module install --force ispavailability-file_concat --version 0.3.0
+puppet module install --force ceritsc-yum --version 0.9.6
+puppet module install --force richardc-datacat --version 0.6.2
 puppet apply -e "class {'puppet_redbox_admin':}" | tee ${LOG_DEST} 
