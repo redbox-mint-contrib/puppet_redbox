@@ -1,8 +1,4 @@
 language: ruby
-cache: 
-  bundler: true
-  directories:
-  - vendor/bundle
 rvm:
  - "1.9.3"
  - "2.0.0-p598"
