@@ -10,8 +10,9 @@ env:
   global:
     - PUPPET_VERSION="3.8.4"
   matrix:
-    - TEST_SUITE="validate lint spec_coverage"
+    - TEST_SUITE="validate lint spec_coverage" 
     - TEST_SUITE="BEAKER_set=default beaker"
+    - TEST_SUITE="BEAKER_set=default beaker" HARVESTER_ARGS='harvester-complete'
 #    - TEST_SUITE="BEAKER_set=centos7-64 beaker"
 script:
- - rake $TEST_SUITE
+ - rake $HARVESTER_ARGS $TEST_SUITE
