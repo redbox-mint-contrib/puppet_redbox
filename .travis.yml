@@ -15,4 +15,4 @@ env:
     - TEST_SUITE="BEAKER_set=default beaker" HARVESTER_ARGS='harvester-complete'
 #    - TEST_SUITE="BEAKER_set=centos7-64 beaker"
 script:
- - rake $HARVESTER_ARGS $TEST_SUITE
+ - rake $TEST_SUITE
