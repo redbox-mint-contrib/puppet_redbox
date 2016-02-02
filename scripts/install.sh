@@ -8,7 +8,7 @@ usage() {
 	fi
 }
 usage
-
+echo "arguments are: $1"
 export LOG_DEST=/var/log/puppet/puppet.log
 mkdir -p /var/log/puppet
 
