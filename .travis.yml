@@ -12,7 +12,7 @@ env:
   matrix:
     - TEST_SUITE="validate lint spec_coverage" 
     - TEST_SUITE="BEAKER_set=default beaker"
-    - TEST_SUITE="HARVESTER_ARGS='harvester-complete' BEAKER_set=default beaker"
+    - TEST_SUITE="BEAKER_set=default beaker" PUPPET_REDBOX_SCRIPT_ARGS='harvester-complete'
 #    - TEST_SUITE="BEAKER_set=centos7-64 beaker"
 script:
  - rake $TEST_SUITE
