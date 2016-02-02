@@ -46,7 +46,6 @@ describe 'puppet_redbox' do
         'package' => 'mint-distro',
         'server_url_context' => 'mint',
         'install_directory' => '/opt/mint',
-        'pre_install'         => 'unzip',
         'post_install'        => [
         'mint-solr-geonames',
         'mint-build-distro-initial-data']
@@ -159,8 +158,8 @@ describe 'puppet_redbox' do
         .that_comes_before('Exec[service httpd restart]')
     }
     it {
-      should contain_file('/mnt/data').with({:owner =>default_redbox_user_parameter, :recurse => true})
-      should contain_file('/mnt/logs').with({:owner =>default_redbox_user_parameter, :recurse => true})
+      should contain_file('/mnt/data').with({:owner =>'root'})
+      should contain_file('/mnt/logs').with({:owner =>'root'})
       should contain_puppet_redbox__move_and_link_all(default_redbox_package_parameters).with({:owner =>default_redbox_user_parameter})
       should contain_puppet_redbox__move_and_link_all(default_mint_package_parameters).with({:owner =>default_redbox_user_parameter})
     }

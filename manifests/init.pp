@@ -42,7 +42,6 @@ class puppet_redbox (
       package             => 'mint-distro',
       server_url_context  => 'mint',
       install_directory   => '/opt/mint',
-      pre_install         => 'unzip',
       post_install        => ['mint-solr-geonames', 'mint-build-distro-initial-data'],
       institutional_build => undef,
     }
@@ -163,6 +162,7 @@ class puppet_redbox (
 
   }
 
+  package { 'unzip': }->
   puppet_common::add_yum_repo { $yum_repos: exec_path => $exec_path } ->
   puppet_redbox::add_redbox_package { [values($packages)]:
     owner           => $redbox_user,
@@ -191,7 +191,7 @@ class puppet_redbox (
 
   # Check flag whether to install Harvester stack
   if $install_type == 'harvester-complete' {
-    puppet_redbox::add_harvesters_complete { '/opt/harvester/': }
+    puppet_redbox::add_harvesters_complete { '/opt/harvester/': require => Package['unzip'] }
   }
 
   tidy { '/var/lib/puppet/reports':
