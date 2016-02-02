@@ -40,4 +40,5 @@ wget -N -O ${REDBOX_INSTALL_DIR}/install.sh https://raw.githubusercontent.com/re
 
 chmod +x ${REDBOX_INSTALL_DIR}/install.sh
 ## ensure that arguments passed to this script are also passed to redbox install script
+echo "Arguments passing to redbox script are: $*"
 ${REDBOX_INSTALL_DIR}/install.sh $*

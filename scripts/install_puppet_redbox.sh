@@ -15,6 +15,7 @@ echo "Trying ruby version..."
 ruby --version || exit 1
 echo "Trying puppet version..."
 puppet --version || exit 1
+echo "Arguments passing to this script are: $*"
 
 export LOG_DEST=/var/log/puppet/puppet.log
 mkdir -p /var/log/puppet
