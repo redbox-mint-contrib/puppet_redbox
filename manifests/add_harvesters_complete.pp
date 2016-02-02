@@ -107,6 +107,8 @@ define puppet_redbox::add_harvesters_complete (
     before => Class['::postgresql::server::install'],
   }
 
+  package { 'unzip': }
+
   # Install Tomcat and install app WARs and their configuration
   service { 'Stop any existing Tomcat':
     ensure    => stopped,
@@ -223,6 +225,7 @@ define puppet_redbox::add_harvesters_complete (
     command => "${wget_download_cmd} groovy-binary-${groovy_version}.zip ${groovy_install_url}${groovy_version}.zip && unzip groovy-binary-${groovy_version}.zip && mv /tmp/groovy-${groovy_version} ${groovy_install_dir} && ln -s ${groovy_install_dir}/bin/groovy /usr/bin/groovy",
     unless  => "ls -l ${groovy_install_dir}",
     path    => ['/usr/bin', '/usr/sbin', '/bin'],
+    require => Package['unzip'],
   } -> exec { 'Downloading helper script for adding sample data.':
     cwd     => '/opt/harvester',
     command => "${wget_download_cmd} addSampleRecord.groovy ${oaiharvester_samplehelper} && chmod +x addSampleRecord.groovy",
