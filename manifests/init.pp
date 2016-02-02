@@ -175,12 +175,14 @@ class puppet_redbox (
     exec_path       => $exec_path,
   } ->
   file { [$relocation_data_dir, $relocation_logs_dir]:
-    owner   => $redbox_user,
-    recurse => true,
-  } ->
+    ensure => directory,
+    owner  => 'root',
+  }
+
   puppet_redbox::move_and_link_all { [values($packages)]:
     owner     => $redbox_user,
     exec_path => $exec_path,
+    require   => [File[$relocation_data_dir], File[$relocation_logs_dir]],
   }
 
   if ($crontab) {

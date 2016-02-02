@@ -16,9 +16,7 @@ define puppet_redbox::move_and_link_directory (
     $relocation_target = $relocation
     $source_target = $target
   }
-  include 'puppet_common'
 
-  create_parent_directories($relocation_target)
   file { $relocation_target:
     ensure => directory,
     owner  => $owner,
