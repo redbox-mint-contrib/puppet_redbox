@@ -7,7 +7,7 @@ gem 'facter', '>=2.2.6', 					:require => false
 
 # code style/validation
 gem 'puppet-lint', '>=0.3.2', 				:require => false
-gem 'metadata-json-lint', '>=0.0.11' 		:require => false
+gem 'metadata-json-lint', '>=0.0.11', 		:require => false
 
 # unit testing and coverage
 gem 'puppetlabs_spec_helper', '>=0.1.0', 	:require => false
