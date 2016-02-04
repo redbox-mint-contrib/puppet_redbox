@@ -8,7 +8,7 @@ usage() {
 	fi
 }
 usage
-
+echo "arguments are: $*"
 export LOG_DEST=/var/log/puppet/puppet.log
 mkdir -p /var/log/puppet
 
@@ -36,6 +36,9 @@ source /root/.bashrc
 export REDBOX_INSTALL_DIR=/tmp/scripts/puppet_redbox
 mkdir -p ${REDBOX_INSTALL_DIR}
 
-wget -N -O ${REDBOX_INSTALL_DIR}/install.sh https://raw.githubusercontent.com/redbox-mint-contrib/puppet_redbox/master/scripts/install_puppet_redbox.sh 
+wget -N -O ${REDBOX_INSTALL_DIR}/install.sh https://raw.githubusercontent.com/redbox-mint-contrib/puppet_redbox/master/scripts/install_puppet_redbox.sh
+
 chmod +x ${REDBOX_INSTALL_DIR}/install.sh
-${REDBOX_INSTALL_DIR}/install.sh
+## ensure that arguments passed to this script are also passed to redbox install script
+echo "Arguments passing to redbox script are: $*"
+${REDBOX_INSTALL_DIR}/install.sh $*

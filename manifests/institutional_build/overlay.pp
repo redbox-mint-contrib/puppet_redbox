@@ -1,36 +1,35 @@
 define puppet_redbox::institutional_build::overlay (
-  $git_clone_url            = $title,
-  $institution_ssh_user     = 'root',
-  $revision                 = 'master',
+  $source                   = $title,
   $system_install_directory = undef,
-  $local_repo_parent        = '/tmp',) {
-  ## required for basename function - as not yet at latest stdlib library.
+  $local_staging_parent     = '/tmp',
+  $overlay_type             = 'puppet') {
+  # # required for basename function - as not yet at latest stdlib library.
   include 'puppet_common'
-  validate_absolute_path($local_repo_parent)
+  validate_absolute_path($local_staging_parent)
 
   if ($system_install_directory == undef) {
     fail('You must specify a system install directory to where the institutional build is to be copied.')
   }
-  $git_base_name = basename($git_clone_url)
 
-  $local_repo = "${local_repo_parent}/${git_base_name}"
-  $latest_or_present = $revision ? {
-    'master' => latest,
-    default  => present
+  $source_base_name = basename($source)
+  $local_staging = "${local_staging_parent}/${source_base_name}"
+
+  case $overlay_type {
+    'git'   : {
+      puppet_redbox::institutional_build::git_overlay { $source:
+        local_staging => $local_staging,
+        before        => Exec["copy files from ${local_staging} to ${system_install_directory}"]
+      }
+    }
+
+    default : {
+      puppet_redbox::institutional_build::puppet_overlay { $source:
+        local_staging => $local_staging,
+        before        => Exec["copy files from ${local_staging} to ${system_install_directory}"]
+      }
+    }
   }
 
-  vcsrepo { "clone ${git_clone_url} to ${local_repo}":
-    ensure   => $latest_or_present,
-    provider => git,
-    source   => $git_clone_url,
-    path     => $local_repo,
-    revision => $revision,
-    user     => $institution_ssh_user,
+  exec { "copy files from ${local_staging} to ${system_install_directory}": command => "/usr/bin/rsync -rcvzh --filter='- .git*' --filter='- README*' ${local_staging}/* ${system_install_directory}/", 
   }
-
-  exec { "copy files from ${local_repo} to ${system_install_directory}":
-    command => "/usr/bin/rsync -rcvzh --filter='- .git*' --filter='- README*' ${local_repo}/* ${system_install_directory}/",
-    require => Vcsrepo["clone ${git_clone_url} to ${local_repo}"],
-  }
-
 }

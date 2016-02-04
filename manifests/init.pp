@@ -42,7 +42,9 @@ class puppet_redbox (
       package             => 'mint-distro',
       server_url_context  => 'mint',
       install_directory   => '/opt/mint',
-      post_install        => ['mint-solr-geonames', 'mint-build-distro-initial-data'],
+      post_install        => [
+        'mint-solr-geonames',
+        'mint-build-distro-initial-data'],
       institutional_build => undef,
     }
   }
@@ -140,8 +142,7 @@ class puppet_redbox (
   }
   )
 
-  class { 'puppet_common::java':
-  }
+  contain 'puppet_common::java'
 
   if ($proxy) {
     class { 'puppet_redbox::add_proxy_server':
@@ -162,8 +163,11 @@ class puppet_redbox (
 
   }
 
-  package { 'unzip': }->
-  puppet_common::add_yum_repo { $yum_repos: exec_path => $exec_path } ->
+  package { 'unzip': }
+  ensure_resource('puppet_common::add_yum_repo', $yum_repos, {
+    'exec_path' => $exec_path
+  }
+  )
   puppet_redbox::add_redbox_package { [values($packages)]:
     owner           => $redbox_user,
     has_ssl         => $has_ssl,
@@ -171,8 +175,11 @@ class puppet_redbox (
     system_config   => $system_config,
     base_server_url => $server_url,
     proxy           => $proxy,
-    require         => [Puppet_common::Add_systemuser[$redbox_user], Class['Puppet_common::Java']],
-    exec_path       => $exec_path,
+    require         => [
+      Puppet_common::Add_systemuser[$redbox_user],
+      Class['Puppet_common::Java'],
+      Puppet_common::Add_yum_repo[$yum_repos],
+      Package['unzip']],
   } ->
   file { [$relocation_data_dir, $relocation_logs_dir]:
     ensure => directory,

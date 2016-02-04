@@ -47,7 +47,11 @@ define puppet_redbox::add_redbox_package (
 
   if ($packages[post_install]) {
     if ($packages[institutional_build]) {
-      $before_post_install_list = [Puppet_redbox::Institutional_build::Overlay[$packages[institutional_build]]]
+      $before_post_install_list = [
+        Puppet_redbox::Institutional_build::Overlay[$packages[institutional_build]],
+        Exec["update ownership to: ${owner} for ${redbox_system}"]]
+    } else {
+      $before_post_install_list = [Exec["update ownership to: ${owner} for ${redbox_system}"]]
     }
 
     package { $packages[post_install]:
@@ -65,7 +69,11 @@ define puppet_redbox::add_redbox_package (
 
   if ($redbox_system == 'redbox') {
     if ($packages[institutional_build]) {
-      $before_list = [Puppet_redbox::Institutional_build::Overlay[$packages[institutional_build]]]
+      $before_list = [
+        Exec["update ownership to: ${owner} for ${redbox_system}"],
+        Puppet_redbox::Institutional_build::Overlay[$packages[institutional_build]]]
+    } else {
+      $before_list = [Exec["update ownership to: ${owner} for ${redbox_system}"]]
     }
 
     puppet_redbox::update_system_config { [
@@ -101,6 +109,7 @@ define puppet_redbox::add_redbox_package (
     server_url => $server_url,
     notify     => Exec["${redbox_system}-restart_on_refresh"],
     subscribe  => Package[$redbox_package],
+    before     => Exec["update ownership to: ${owner} for ${redbox_system}"],
   }
 
   if ($packages[institutional_build]) {
@@ -111,7 +120,14 @@ define puppet_redbox::add_redbox_package (
       system_install_directory => $packages[install_directory],
       notify                   => [Service[$redbox_system]],
       require                  => $require_list,
+      before                   => Exec["update ownership to: ${owner} for ${redbox_system}"],
     }
+  }
+
+  # # ensure after all package updates, that ownership is ensured
+  exec { "update ownership to: ${owner} for ${redbox_system}":
+    command => "chown -R ${owner}:${owner} ${packages[install_directory]}",
+    require => Package[$redbox_package]
   }
 
   service { $redbox_system:
@@ -144,5 +160,4 @@ define puppet_redbox::add_redbox_package (
         Exec["${redbox_system}-restart_on_refresh"],
         Service[$redbox_system]], }
   }
-
 }
