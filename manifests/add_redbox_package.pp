@@ -85,22 +85,22 @@ define puppet_redbox::add_redbox_package (
       before        => $before_list,
     }
 
-    if ($system_config and $system_config[api]) {
-      file_line { 'update system-config.json api key':
-        path      => "${packages[install_directory]}/home/config-include/2-misc-modules/apiSecurity.json",
-        line      => "\"apiKey\": \"${system_config[api][clients][apiKey]}\",",
-        match     => "\"apiKey\":.*$",
-        subscribe => Package[$redbox_package],
-        before    => $before_list,
-      } ->
-      file_line { 'update system-config.json api user':
-        path      => "${packages[install_directory]}/home/config-include/2-misc-modules/apiSecurity.json",
-        line      => "\"username\": \"${system_config[api][clients][username]}\"",
-        match     => '\"username\":.*$',
-        subscribe => Package[$redbox_package],
-        before    => $before_list,
-      }
-    }
+#    if ($system_config and $system_config[api]) {
+#      file_line { 'update system-config.json api key':
+#        path      => "${packages[install_directory]}/home/config-include/2-misc-modules/apiSecurity.json",
+#        line      => "\"apiKey\": \"${system_config[api][clients][apiKey]}\",",
+#        match     => "\"apiKey\":.*$",
+#        subscribe => Package[$redbox_package],
+#        before    => $before_list,
+#      } ->
+#      file_line { 'update system-config.json api user':
+#        path      => "${packages[install_directory]}/home/config-include/2-misc-modules/apiSecurity.json",
+#        line      => "\"username\": \"${system_config[api][clients][username]}\"",
+#        match     => '\"username\":.*$',
+#        subscribe => Package[$redbox_package],
+#        before    => $before_list,
+#      }
+#    }
   }
 
   puppet_redbox::update_server_env { "${packages[install_directory]}/server/tf_env.sh":
