@@ -6,6 +6,9 @@ rvm:
 sudo: required
 services:
  - docker
+branches:
+  only:
+    - master
 env:
   global:
     - PUPPET_VERSION="3.8.4"
