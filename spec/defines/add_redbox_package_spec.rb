@@ -32,10 +32,6 @@ describe 'puppet_redbox::add_redbox_package' do
       {
       'path' => '/redbox',
       'url'=> 'http://localhost:9000/redbox'
-      },
-      {
-      'path' => '/oai-server',
-      'url'  => 'http://localhost:8080/oai-server'
       }]
   end
   let :default_params do {
@@ -68,7 +64,7 @@ describe 'puppet_redbox::add_redbox_package' do
     it "has known set of resources" do
       should have_notify_resource_count(1)
       should have_file_resource_count(1)
-      should have_exec_resource_count(2)
+      should have_exec_resource_count(3)
       should have_file_line_resource_count(1)
       should have_package_resource_count(1)
       should have_service_resource_count(1)
@@ -122,7 +118,7 @@ describe 'puppet_redbox::add_redbox_package' do
     end
     it "has known set of resources" do
       should have_file_resource_count(2)
-      should have_exec_resource_count(5)
+      should have_exec_resource_count(6)
       should have_file_line_resource_count(1)
       should have_package_resource_count(1)
       should have_service_resource_count(1)
@@ -162,12 +158,12 @@ describe 'puppet_redbox::add_redbox_package' do
         'package' => 'redbox-distro',
         'server_url_context' => 'redbox',
         'install_directory' => '/opt/redbox',
-        'institutional_build' => 'https://github.com/redbox-mint-contrib/rb-sample-1.8-institutional-build.git'
+        'institutional_build' => 'puppet:///foobar/modules/rds-genomics'
       }})
     end
     it "has known set of resources" do
-      should have_file_resource_count(2)
-      should have_exec_resource_count(6)
+      should have_file_resource_count(3)
+      should have_exec_resource_count(7)
       should have_file_line_resource_count(1)
       should have_package_resource_count(1)
       should have_service_resource_count(1)
@@ -186,7 +182,7 @@ describe 'puppet_redbox::add_redbox_package' do
       should contain_file_line('update_server_url_/opt/redbox/server/tf_env.sh')
         .with({'path' => '/opt/redbox/server/tf_env.sh', 'line' => 'export SERVER_URL="http://10.5.6.7/redbox/"', 'match' => '^export SERVER_URL=".*"$'})
         .that_subscribes_to('Package[redbox-distro]')
-      should contain_puppet_redbox__institutional_build__overlay('https://github.com/redbox-mint-contrib/rb-sample-1.8-institutional-build.git')
+      should contain_puppet_redbox__institutional_build__overlay('puppet:///foobar/modules/rds-genomics')
         .with({'system_install_directory' => '/opt/redbox'})
         .that_notifies('Service[redbox]')
         .that_requires('Package[redbox-distro]')

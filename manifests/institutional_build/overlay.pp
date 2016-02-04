@@ -30,6 +30,6 @@ define puppet_redbox::institutional_build::overlay (
     }
   }
 
-  exec { "copy files from ${local_staging} to ${system_install_directory}": command => "/usr/bin/rsync -rcvzh --filter='- .git*' --filter='- README*' ${local_staging}/* ${system_install_directory}/", 
+  exec { "copy files from ${local_staging} to ${system_install_directory}": command => "/usr/bin/rsync -rcvzh --filter='- .git*' --filter='- README*' ${local_staging}/* ${system_install_directory}/"
   }
 }

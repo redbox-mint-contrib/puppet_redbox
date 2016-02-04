@@ -14,19 +14,21 @@ describe 'puppet_redbox::institutional_build::overlay' do
     }
   end
 
-  context "Given default parameters" do
+  context "Given git parameters" do
     include_context "stubbed params"
     let :params do
-      default_params
+      default_params.merge({:overlay_type => 'git'})
     end
 
     it { should compile.with_all_deps }
 
-    it { should have_resource_count(3) }
+    it { should have_resource_count(4) }
 
     it { should have_puppet_redbox__institutional_build__overlay_resource_count(1) }
 
     it { should have_vcsrepo_resource_count(1) }
+
+    it { should have_puppet_redbox__institutional_build__git_overlay_resource_count(1)}
 
     it { should have_exec_resource_count(1) }
 
@@ -52,7 +54,7 @@ describe 'puppet_redbox::institutional_build::overlay' do
     include_context "stubbed params"
     let :params do
       default_params.merge({
-        :local_repo_parent => 'tmp'
+        :local_staging_parent => 'tmp'
       })
     end
 
@@ -76,19 +78,4 @@ describe 'puppet_redbox::institutional_build::overlay' do
 
   end
 
-  context "Given revision is not master" do
-    include_context "stubbed params"
-    let :params do
-      default_params.merge({
-        :revision => '0123',
-      })
-    end
-
-    it do
-      should contain_vcsrepo("clone #{stubbed_title} to #{stubbed_local_repo}").with({
-        :ensure   => 'present'
-      })
-    end
-
-  end
 end
