@@ -49,7 +49,7 @@ class puppet_redbox (
     }
   }
   ),
-  $proxy                    = hiera_array(proxy, [
+  $proxy                    = hiera(proxy, [
     {
       path => '/mint',
       url  => 'http://localhost:9001/mint'
