@@ -1,0 +1,16 @@
+HOSTS:
+  centos-master-64:
+    roles:
+      - master
+    platform: el-7-x86_64
+    hypervisor: docker
+    image: centos:7
+    docker_cmd: ['/sbin/init']
+  centos-agent-64:
+    roles:
+      - agent
+    platform: el-6-x86_64
+    hypervisor: docker
+    image: centos:6.7
+CONFIG:
+  log_level: verbose
