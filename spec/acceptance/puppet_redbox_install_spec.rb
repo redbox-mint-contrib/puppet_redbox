@@ -52,15 +52,15 @@ describe 'puppet_redbox basic install' do
   end
   it 'shows redbox and mint services' do
     ['redbox','mint'].each do |system|
-      case fact('osfamily')
-      when 'RedHat'
-        case fact('operatingsystemmajrelease')
-        when '7'
-          service_command = "systemctl status #{system}"
-        else
+#      case fact('osfamily')
+#      when 'RedHat'
+#        case fact('operatingsystemmajrelease')
+#        when '7'
+#          service_command = "systemctl status #{system}"
+#        else
           service_command = "service #{system} status"
-        end
-      end
+#        end
+#      end
       result = on(agents.first, service_command)
       expect(result.exit_code).to eq 0
       expect(result.stdout).to match /is running/
