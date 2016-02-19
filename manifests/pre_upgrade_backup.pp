@@ -31,7 +31,23 @@ define puppet_redbox::pre_upgrade_backup (
     $backup_destination = "${backup_destination_parent_path}/backup_${system_name}"
     validate_absolute_path($backup_destination)
 
-    exec { "stop ${system_name} before backup": command => "service ${system_name} stop || echo 'service not running'", }
+    case $::operatingsystem {
+      'CentOS', 'RedHat', 'Fedora' : {
+        case $::operatingsystemmajrelease {
+          '7'     : {
+            $service_stop_command = "systemctl stop ${system_name}"
+            $service_restart_command = "systemctl restart ${system_name}"
+          }
+          default : {
+            $service_stop_command = "service ${system_name} stop"
+            $service_restart_command = "service ${system_name} restart"
+          }
+
+        }
+      }
+    }
+
+    exec { "stop ${system_name} before backup": command => "${service_stop_command} || echo 'service not running'", }
 
     file { $backup_destination: ensure => directory, }
 
@@ -44,7 +60,7 @@ define puppet_redbox::pre_upgrade_backup (
     }
 
     exec { "restart ${system_name} after backup":
-      command => "service ${system_name} restart || echo 'service not running'",
+      command => "${service_restart_command} || echo 'service not running'",
       require => [Exec["backup sources: ${$backup_source} to: ${backup_destination}"]]
     }
   } else {

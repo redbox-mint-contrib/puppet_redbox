@@ -3,7 +3,10 @@ require 'spec_helper'
 describe 'puppet_redbox::pre_upgrade_backup' do
   shared_context "production facts" do
     let :facts do {
-        :environment => 'production'
+        :environment => 'production',
+        :osfamily => 'Redhat',
+        :operatingsystem => 'CentOS',
+        :operatingsystemrelease => '6.7'
       }
     end
   end
