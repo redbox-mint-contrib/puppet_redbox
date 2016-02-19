@@ -30,9 +30,6 @@ if any_hosts_as?('master')
     }
   }
   configure_puppet_on(master, config)
-  #    on master, "yum -y install msgpack"
-  ## facter fqdn is reliable way to ensure master-agent exchange matches on certificate
-  #    on master, 'echo "server=$(facter fqdn)" >> /etc/puppet/puppet.conf'
   on master, "cat /etc/hosts"
   on master, "cat /etc/puppet/puppet.conf"
   on master, "ruby --version"
@@ -57,10 +54,6 @@ if any_hosts_as?('master')
   on master, "touch /etc/puppet/manifests/site.pp"
   on master, 'echo "node default { include \"puppet_redbox\" }" > /etc/puppet/manifests/site.pp'
   on master, "cat /etc/puppet/manifests/site.pp"
-  ## start master and agent
-  #    on master, "mkdir -p /etc/puppet/modules/concat/facts.d && mkdir -p /etc/puppet/modules/conct/facts.d"
-  #    on master, "export FACTER_concat_basedir=/tmp"
-  #    on master, "puppet apply -e \"class {'puppet_common::update_fqdn': updated_fqdn => '#{master_fqdn}'}\""
   on master, "puppet master -d"
   on master, "ps -efl | grep puppet"
   on agents, "yum install -y git"
