@@ -47,7 +47,7 @@ define puppet_redbox::pre_upgrade_backup (
       }
     }
 
-    exec { "turn on ${system_name}": command => "chkconfig ${system_name} on" } ->
+    exec { "turn on ${system_name}": command => "chkconfig ${system_name} on || echo 'service not available'" } ->
     exec { "stop ${system_name} before backup": command => "${service_stop_command} || echo 'service not running'", }
 
     file { $backup_destination: ensure => directory, }
