@@ -70,7 +70,7 @@ if any_hosts_as?('master')
   on agents, "source /root/.bashrc && ruby --version && puppet --version"
   on agents, "mkdir -p /etc/puppet"
   on agents, "touch /etc/puppet/puppet.conf"
-  configure_puppet_on(agent_only, config)
+  configure_puppet_on(agents, config)
   on agents, "echo \"server=#{master_fqdn}\" >> /etc/puppet/puppet.conf"
   on agents, "cat /etc/hosts"
   on agents, "cat /etc/puppet/puppet.conf"
