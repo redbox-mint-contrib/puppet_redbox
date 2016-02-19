@@ -1,11 +1,6 @@
 require 'spec_helper_acceptance'
 
 describe 'puppet_redbox pre-install environment' do
-  it 'should output correct platform details' do
-    shell_result = shell("cat /etc/redhat-release")
-    expect(shell_result.exit_code).to eq 0
-    expect(shell_result.stdout).to match /CentOS.*release 6.7/
-  end
   it 'should show puppet_redbox install script' do
     shell_result = shell("ls -l /tmp/install.sh")
     expect(shell_result.exit_code).to eq 0
@@ -61,6 +56,15 @@ describe 'puppet_redbox basic install' do
     end
   end
   it 'shows redbox and mint services' do
+    case fact('osfamily')
+    when 'RedHat'
+      case fact('operatingsystemmajrelease')
+      when '7'
+        service_command = "systemctl status #{system}"
+      else
+        service_command = "service #{system} status"
+      end
+    end
     ['redbox','mint'].each do |system|
       shell_result = shell("service #{system} status")
       expect(shell_result.exit_code).to eq 0

@@ -23,6 +23,22 @@ define puppet_redbox::add_redbox_package (
   $redbox_package = $packages[package]
   $redbox_system = $packages[system]
 
+  case $::operatingsystem {
+    'CentOS', 'RedHat', 'Fedora' : {
+      case $::operatingsystemmajrelease {
+        '7'     : {
+          $service_status_command = "systemctl status ${redbox_system}"
+          $service_restart_command = "systemctl restart ${redbox_system}"
+        }
+        default : {
+          $service_status_command = "service ${redbox_system} status"
+          $service_restart_command = "service ${redbox_system} restart"
+        }
+
+      }
+    }
+  }
+
   puppet_common::add_directory { $packages[install_directory]:
     owner  => $owner,
     before => Package[$redbox_package]
@@ -135,12 +151,12 @@ define puppet_redbox::add_redbox_package (
     enable     => true,
     hasstatus  => true,
     hasrestart => true,
-    status     => "service ${redbox_system} status | grep 'is running'",
+    status     => "${service_status_command} | grep 'is running'",
     subscribe  => Package[$redbox_package],
   }
 
   exec { "${redbox_system}-restart_on_refresh":
-    command     => "service ${redbox_system} restart",
+    command     => $service_restart_command,
     tries       => 2,
     try_sleep   => 3,
     refreshonly => true,
