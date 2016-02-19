@@ -74,7 +74,7 @@ if any_hosts_as?('master')
   on agents, "echo \"server=#{master_fqdn}\" >> /etc/puppet/puppet.conf"
   on agents, "cat /etc/hosts"
   on agents, "cat /etc/puppet/puppet.conf"
-  on agents, "sleep 5 && puppet agent --test --waitforcert 30"
+  on agents, "sleep 5 && puppet agent --test --detailed-exitcodes --waitforcert 30", :acceptable_exit_codes => [0,2,6]
 else
   hosts.each do |host|
     scp_to host, File.expand_path(File.join(File.dirname(__FILE__), '..', redbox_script)), "/tmp/install.sh"
