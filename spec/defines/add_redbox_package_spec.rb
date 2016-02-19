@@ -118,7 +118,7 @@ describe 'puppet_redbox::add_redbox_package' do
     end
     it "has known set of resources" do
       should have_file_resource_count(2)
-      should have_exec_resource_count(6)
+      should have_exec_resource_count(7)
       should have_file_line_resource_count(1)
       should have_package_resource_count(1)
       should have_service_resource_count(1)
@@ -163,7 +163,7 @@ describe 'puppet_redbox::add_redbox_package' do
     end
     it "has known set of resources" do
       should have_file_resource_count(3)
-      should have_exec_resource_count(7)
+      should have_exec_resource_count(8)
       should have_file_line_resource_count(1)
       should have_package_resource_count(1)
       should have_service_resource_count(1)

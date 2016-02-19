@@ -26,15 +26,15 @@ describe 'puppet_redbox::pre_upgrade_backup' do
     it {should compile.with_all_deps}
 
     it "has a known and consistent number of resources" do
-      should have_resource_count(5)
+      should have_resource_count(6)
 
       should have_puppet_redbox__pre_upgrade_backup_resource_count(1)
 
       # file resource ensures backup destination folder
       should have_file_resource_count(1)
 
-      # exec resources 1.stop system, 2. backup, and 3. start system
-      should have_exec_resource_count(3)
+      # exec resources 1.turn chkconfig on 2. stop system, 3. backup, and 4. start system
+      should have_exec_resource_count(4)
     end
 
     it "should create backup directory" do
