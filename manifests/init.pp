@@ -45,7 +45,7 @@ class puppet_redbox (
       post_install        => [
         'mint-solr-geonames',
         'mint-build-distro-initial-data'],
-      institutional_build => '',
+      institutional_build => 'puppet:///modules/puppet_redbox_institution/rds-genomics',
     }
   }
   ),
