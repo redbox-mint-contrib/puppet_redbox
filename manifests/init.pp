@@ -34,7 +34,7 @@ class puppet_redbox (
       package             => 'redbox-distro',
       server_url_context  => 'redbox',
       install_directory   => '/opt/redbox',
-      institutional_build => '',
+      institutional_build => 'puppet:///modules/puppet_redbox_institution/rds-genomics',
     }
     ,
     mint                => {
@@ -45,7 +45,7 @@ class puppet_redbox (
       post_install        => [
         'mint-solr-geonames',
         'mint-build-distro-initial-data'],
-      institutional_build => 'puppet:///modules/puppet_redbox_institution/rds-genomics',
+      institutional_build => '',
     }
   }
   ),
