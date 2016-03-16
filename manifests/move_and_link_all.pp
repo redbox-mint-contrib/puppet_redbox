@@ -8,7 +8,7 @@ define puppet_redbox::move_and_link_all (
   if ($exec_path) {
     Exec {
       path      => $exec_path,
-      logoutput => false,
+      logoutput => true,
     }
   }
   $system = $packages[system]
