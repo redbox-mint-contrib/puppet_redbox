@@ -88,7 +88,7 @@ describe 'puppet_redbox::add_redbox_package' do
         .that_subscribes_to('Package[redbox-distro]')
       should contain_exec('redbox-restart_on_refresh').with({'command' => 'service redbox restart'})
         .that_subscribes_to('File_line[update_server_url_/opt/redbox/server/tf_env.sh]')
-      should contain_exec('10.5.6.7/redbox-primer').with({'command' => 'wget --no-check-certificate --tries=2 --wait=10 --spider -O /dev/null 10.5.6.7/redbox'})
+      should contain_exec('10.5.6.7/redbox-primer').with({'command' => /wget.*10.5.6.7\/redbox/})
     end
   end
   context "given versioned redbox" do
@@ -143,7 +143,7 @@ describe 'puppet_redbox::add_redbox_package' do
         .that_subscribes_to('Package[redbox-distro]')
       should contain_exec('redbox-restart_on_refresh').with({'command' => 'service redbox restart'})
         .that_subscribes_to('File_line[update_server_url_/opt/redbox/server/tf_env.sh]')
-      should contain_exec('10.5.6.7/redbox-primer').with({'command' => 'wget --no-check-certificate --tries=2 --wait=10 --spider -O /dev/null 10.5.6.7/redbox'})
+      should contain_exec('10.5.6.7/redbox-primer').with({'command' => /wget.*10.5.6.7\/redbox/})
     end
   end
   context "given production redbox with institutional build" do
@@ -193,7 +193,7 @@ describe 'puppet_redbox::add_redbox_package' do
         .that_subscribes_to('Package[redbox-distro]')
       should contain_exec('redbox-restart_on_refresh').with({'command' => 'service redbox restart'})
         .that_subscribes_to('File_line[update_server_url_/opt/redbox/server/tf_env.sh]')
-      should contain_exec('10.5.6.7/redbox-primer').with({'command' => 'wget --no-check-certificate --tries=2 --wait=10 --spider -O /dev/null 10.5.6.7/redbox'})
+      should contain_exec('10.5.6.7/redbox-primer').with({'command' => /wget.*10.5.6.7\/redbox/})
     end  
   end
 end
