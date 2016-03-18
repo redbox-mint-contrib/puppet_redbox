@@ -163,7 +163,7 @@ class puppet_redbox (
 
   }
 
-  package { 'unzip': }
+  ensure_packages('unzip')
   ensure_resource('puppet_common::add_yum_repo', $yum_repos, {
     'exec_path' => $exec_path
   }
