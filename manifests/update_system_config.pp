@@ -3,6 +3,7 @@ define puppet_redbox::update_system_config (
   $system_config      = undef,
   $root_path          = get_module_path('puppet_redbox')) {
   if ($system_config) {
+    ##TODO: refactor and use with new manifests/functions in puppet_common
     $load_path = "${root_path}/lib/augeas/lenses"
 
     ensure_packages('augeas')
