@@ -137,7 +137,7 @@ define puppet_redbox::add_redbox_package (
       notify                   => [Service[$redbox_system]],
       require                  => $require_list,
       before                   => Exec["update ownership to: ${owner} for ${redbox_system}"],
-    }
+    } ~> exec { "restart after overlay for ${redbox_system}": command => "service restart ${redbox_system}" }
   }
 
   # # ensure after all package updates, that ownership is ensured
