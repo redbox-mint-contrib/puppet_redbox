@@ -25,7 +25,6 @@ sudo rake spec
 ```
 ## Optional Features
 
-
 License
 -------
 See file, LICENCE
