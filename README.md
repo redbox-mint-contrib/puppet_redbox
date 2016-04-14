@@ -25,8 +25,6 @@ sudo rake spec
 ```
 ## Optional Features
 
-1. Follow puppet-hiera-redbox's README.md if installing bitbucket module puppet-hiera-redbox
-
 
 License
 -------
