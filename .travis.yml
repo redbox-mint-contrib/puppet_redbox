@@ -15,4 +15,4 @@ env:
 #    - TEST_SUITE="BEAKER_set=centos7-64 beaker"
     - TEST_SUITE="BEAKER_set=centos-masteragent-64 beaker"
 script:
- - rake $TEST_SUITE
+ - travis_wait rake $TEST_SUITE
