@@ -184,7 +184,7 @@ class puppet_redbox (
   file { [$relocation_data_dir, $relocation_logs_dir]:
     ensure => directory,
     owner  => 'root',
-  }
+  } -> exec { "restart after overlay for ${redbox_system}": command => "service restart ${redbox_system}" }
 
   puppet_redbox::move_and_link_all { [values($packages)]:
     owner     => $redbox_user,
