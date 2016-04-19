@@ -189,7 +189,7 @@ class puppet_redbox (
   puppet_redbox::move_and_link_all { [values($packages)]:
     owner     => $redbox_user,
     exec_path => $exec_path,
-    require   => [File[$relocation_data_dir], File[$relocation_logs_dir]],
+    require   => [File[$relocation_data_dir], File[$relocation_logs_dir], Puppet_redbox::Restart_system[values($packages)]],
   }
 
   if ($crontab) {
