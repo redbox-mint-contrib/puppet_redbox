@@ -129,14 +129,16 @@ define puppet_redbox::add_redbox_package (
   }
 
   if ($packages[institutional_build]) {
-    $require_list = [Package[$redbox_package], Puppet_redbox::Update_server_env["${packages[install_directory]}/server/tf_env.sh"]]
+    $require_list = [Package[$redbox_package]]
 
     # # institutional overlay should be last of package/config installs
     puppet_redbox::institutional_build::overlay { $packages[institutional_build]:
       system_install_directory => $packages[install_directory],
       notify                   => [Service[$redbox_system]],
       require                  => $require_list,
-      before                   => Exec["update ownership to: ${owner} for ${redbox_system}"],
+      before                   => [
+        Exec["update ownership to: ${owner} for ${redbox_system}"],
+        Puppet_redbox::Update_server_env["${packages[install_directory]}/server/tf_env.sh"]],
     }
   }
 

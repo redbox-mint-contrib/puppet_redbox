@@ -186,7 +186,7 @@ describe 'puppet_redbox::add_redbox_package' do
         .with({'system_install_directory' => '/opt/redbox'})
         .that_notifies('Service[redbox]')
         .that_requires('Package[redbox-distro]')
-        .that_requires('File_line[update_server_url_/opt/redbox/server/tf_env.sh]')
+        .that_comes_before('File_line[update_server_url_/opt/redbox/server/tf_env.sh]')
     end
     it "starts the installed system" do
       should contain_service('redbox')
