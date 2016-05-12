@@ -83,7 +83,7 @@ if [ -e /tmp/puppet-hiera-redbox/scripts/install.sh ]; then
 fi
 
 # Install ReDBox
-puppet apply -e "class {'puppet_redbox': install_type=>'$INSTALL_TYPE'}" | tee ${LOG_DEST}
+puppet apply -e "class {'puppet_redbox': install_type=>'$INSTALL_TYPE', is_fresh_install => true}" | tee ${LOG_DEST}
 
 # ReDBox admin is part of the default install
 rm -Rf /usr/share/puppet/modules/puppet_redbox_admin

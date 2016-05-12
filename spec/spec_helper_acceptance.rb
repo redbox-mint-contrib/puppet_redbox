@@ -52,7 +52,7 @@ if any_hosts_as?('master')
   ## add site manifest
   on master, "mkdir -p /etc/puppet/manifests"
   on master, "touch /etc/puppet/manifests/site.pp"
-  on master, 'echo "node default { include \"puppet_redbox\" }" > /etc/puppet/manifests/site.pp'
+  on master, 'echo "node default { class {\'puppet_redbox\': if_fresh_install => true} }" > /etc/puppet/manifests/site.pp'
   on master, "cat /etc/puppet/manifests/site.pp"
   on master, "puppet master -d"
   on master, "ps -efl | grep puppet"
