@@ -92,7 +92,7 @@ describe 'puppet_redbox' do
     include_context "default facts"
     include_context "always should"
     let :params do
-      default_params
+      default_params.merge({:is_fresh_install => true})
     end
     
     it 'Given fqdn: site.domain.com.au' do
