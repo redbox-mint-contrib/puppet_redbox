@@ -28,6 +28,7 @@ class puppet_redbox (
   $install_type             = 'basic',
   $redbox_user              = hiera(redbox_user, 'redbox'),
   $install_parent_directory = hiera(install_parent_directory, '/opt'),
+  $is_fresh_install         = false,
   $packages                 = hiera_hash(packages, {
     redbox              => {
       system              => 'redbox',
@@ -186,10 +187,15 @@ class puppet_redbox (
     owner  => 'root',
   } -> puppet_redbox::restart_system { [values($packages)]: }
 
-  puppet_redbox::move_and_link_all { [values($packages)]:
-    owner     => $redbox_user,
-    exec_path => $exec_path,
-    require   => [File[$relocation_data_dir], File[$relocation_logs_dir], Puppet_redbox::Restart_system[values($packages)]],
+  # #hack for now until resolve issue of too much file recursion (or rip out altogether)
+  if ($is_fresh_install) {
+    puppet_redbox::move_and_link_all { [values($packages)]:
+      owner     => $redbox_user,
+      exec_path => $exec_path,
+      require   => [File[$relocation_data_dir], File[$relocation_logs_dir], Puppet_redbox::Restart_system[values($packages)]],
+    }
+  } else {
+    notify { 'WARNING: No links will be created or checked, so ensure this is NOT a fresh install.': }
   }
 
   if ($crontab) {
