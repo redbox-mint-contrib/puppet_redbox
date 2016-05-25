@@ -28,7 +28,7 @@ class puppet_redbox (
   $install_type             = 'basic',
   $redbox_user              = hiera(redbox_user, 'redbox'),
   $install_parent_directory = hiera(install_parent_directory, '/opt'),
-  $is_fresh_install         = true,
+  $is_fresh_install         = false,
   $packages                 = hiera_hash(packages, {
     redbox              => {
       system              => 'redbox',
