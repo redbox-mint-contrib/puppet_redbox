@@ -43,9 +43,7 @@ class puppet_redbox (
       package             => 'mint-distro',
       server_url_context  => 'mint',
       install_directory   => '/opt/mint',
-      post_install        => [
-        'mint-solr-geonames',
-        'mint-build-distro-initial-data'],
+      post_install        => ['mint-solr-geonames'],
       institutional_build => '',
     }
   }
