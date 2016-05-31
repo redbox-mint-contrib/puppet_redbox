@@ -2,8 +2,20 @@ define puppet_redbox::add_csv_uploader (
   $source                     = $title,
   $extract_path               = '/opt',
   $download_path              = undef,
-  $can_download_and_overwrite = true,) {
+  $can_download_and_overwrite = true,
+  $exec_path                  = hiera_array(exec_path, [
+    '/usr/local/bin',
+    '/opt/local/bin',
+    '/usr/bin',
+    '/usr/sbin',
+    '/bin',
+    '/sbin']),) {
   #  require 'archive'
+
+  Exec {
+    path      => $exec_path,
+    logoutput => false,
+  }
 
   if (!$download_path) {
     fail("Must define an absolute download path including filename.")
