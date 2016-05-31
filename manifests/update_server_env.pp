@@ -11,7 +11,7 @@ define puppet_redbox::update_server_env (
   }
 
   if ($has_institutional_overlay) {
-    notify { "There is an institutional overlay present, so server url should only be updated there.": }
+    #notify { "There is an institutional overlay present, so server url should only be updated there.": }
   } else {
     file_line { "update_server_url_${server_path}":
       path  => $server_path,
