@@ -3,7 +3,7 @@ define puppet_redbox::add_csv_uploader (
   $extract_path               = '/opt',
   $download_path              = undef,
   $can_download_and_overwrite = true,) {
-#  require 'archive'
+  #  require 'archive'
 
   if (!$download_path) {
     fail("Must define an absolute download path including filename.")
@@ -21,7 +21,7 @@ define puppet_redbox::add_csv_uploader (
   #  $archive_name = basename($source)
   #  $full_download_path = "${download_path}/${archive_name}"
 
-  ensure_package { 'unzip': }
+  ensure_packages('unzip')
   exec { "wget ${source} -O ${download_path}": } ->
   exec { "unzip -u -d ${extract_path}/ ${download_path}": require => Package['unzip'], }
 
