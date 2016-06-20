@@ -35,7 +35,7 @@ define puppet_redbox::add_csv_uploader (
 
   ensure_packages('unzip')
   exec { "wget ${source} -O ${download_path}": } ->
-  exec { "unzip -u -d ${extract_path}/ ${download_path}": require => Package['unzip'], }
+  exec { "unzip -u -d ${extract_path}/ ${download_path}": require => Package['unzip'], returns => [0, 1, 2] }
 
   #  archive { $full_download_path:
   #    extract_path => $extract_path,
