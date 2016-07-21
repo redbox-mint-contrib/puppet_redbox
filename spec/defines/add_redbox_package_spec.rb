@@ -65,7 +65,6 @@ describe 'puppet_redbox::add_redbox_package' do
       should have_notify_resource_count(1)
       should have_file_resource_count(1)
       should have_exec_resource_count(3)
-      should have_file_line_resource_count(1)
       should have_package_resource_count(1)
       should have_service_resource_count(1)
     end
@@ -78,16 +77,10 @@ describe 'puppet_redbox::add_redbox_package' do
     it "installs the main package" do
       should contain_package('redbox-distro').with({'ensure' => 'installed'})
     end
-    it "updates the main package installation" do
-      should contain_file_line('update_server_url_/opt/redbox/server/tf_env.sh')
-        .with({'path' => '/opt/redbox/server/tf_env.sh', 'line' => 'export SERVER_URL="http://10.5.6.7/redbox/"', 'match' => '^export SERVER_URL=".*"$'})
-        .that_subscribes_to('Package[redbox-distro]')
-    end
     it "starts the installed system" do
       should contain_service('redbox')
         .that_subscribes_to('Package[redbox-distro]')
       should contain_exec('redbox-restart_on_refresh').with({'command' => 'service redbox restart'})
-        .that_subscribes_to('File_line[update_server_url_/opt/redbox/server/tf_env.sh]')
       should contain_exec('10.5.6.7/redbox-primer').with({'command' => /wget.*10.5.6.7\/redbox/})
     end
   end
@@ -119,7 +112,6 @@ describe 'puppet_redbox::add_redbox_package' do
     it "has known set of resources" do
       should have_file_resource_count(2)
       should have_exec_resource_count(7)
-      should have_file_line_resource_count(1)
       should have_package_resource_count(1)
       should have_service_resource_count(1)
     end
@@ -133,16 +125,10 @@ describe 'puppet_redbox::add_redbox_package' do
     it "installs the main package" do
       should contain_package('redbox-distro').with({'ensure' => 'installed'})
     end
-    it "updates the main package installation" do
-      should contain_file_line('update_server_url_/opt/redbox/server/tf_env.sh')
-        .with({'path' => '/opt/redbox/server/tf_env.sh', 'line' => 'export SERVER_URL="http://10.5.6.7/redbox/"', 'match' => '^export SERVER_URL=".*"$'})
-        .that_subscribes_to('Package[redbox-distro]')
-    end
     it "starts the installed system" do
       should contain_service('redbox')
         .that_subscribes_to('Package[redbox-distro]')
       should contain_exec('redbox-restart_on_refresh').with({'command' => 'service redbox restart'})
-        .that_subscribes_to('File_line[update_server_url_/opt/redbox/server/tf_env.sh]')
       should contain_exec('10.5.6.7/redbox-primer').with({'command' => /wget.*10.5.6.7\/redbox/})
     end
   end
@@ -164,7 +150,6 @@ describe 'puppet_redbox::add_redbox_package' do
     it "has known set of resources" do
       should have_file_resource_count(3)
       should have_exec_resource_count(8)
-      should have_file_line_resource_count(1)
       should have_package_resource_count(1)
       should have_service_resource_count(1)
     end
@@ -179,20 +164,15 @@ describe 'puppet_redbox::add_redbox_package' do
       should contain_package('redbox-distro').with({'ensure' => 'installed'})
     end
     it "updates the main package installation" do
-      should contain_file_line('update_server_url_/opt/redbox/server/tf_env.sh')
-        .with({'path' => '/opt/redbox/server/tf_env.sh', 'line' => 'export SERVER_URL="http://10.5.6.7/redbox/"', 'match' => '^export SERVER_URL=".*"$'})
-        .that_subscribes_to('Package[redbox-distro]')
       should contain_puppet_redbox__institutional_build__overlay('puppet:///foobar/modules/rds-genomics')
         .with({'system_install_directory' => '/opt/redbox'})
         .that_notifies('Service[redbox]')
         .that_requires('Package[redbox-distro]')
-        .that_comes_before('File_line[update_server_url_/opt/redbox/server/tf_env.sh]')
     end
     it "starts the installed system" do
       should contain_service('redbox')
         .that_subscribes_to('Package[redbox-distro]')
       should contain_exec('redbox-restart_on_refresh').with({'command' => 'service redbox restart'})
-        .that_subscribes_to('File_line[update_server_url_/opt/redbox/server/tf_env.sh]')
       should contain_exec('10.5.6.7/redbox-primer').with({'command' => /wget.*10.5.6.7\/redbox/})
     end  
   end

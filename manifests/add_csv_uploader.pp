@@ -18,7 +18,7 @@ define puppet_redbox::add_csv_uploader (
   }
 
   if (!$download_path) {
-    fail("Must define an absolute download path including filename.")
+    fail('Must define an absolute download path including filename.')
   }
 
   #  $creates = $can_download_and_overwrite ? {
