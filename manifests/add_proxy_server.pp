@@ -67,6 +67,6 @@ class puppet_redbox::add_proxy_server (
       line  => 'SSLProxyEngine On',
       match => '^.*SSLProxyEngine[[:space:]]+..[[:space:]]*$',
     } ->
-    puppet_common::patch_ssl { 'patch proxy ssl for redbox': } -> puppet_common::patch_apache { 'patch other apache for redbox': }
+    puppet_common::patch_ssl { 'patch proxy ssl for redbox': }
   }
 }
