@@ -14,6 +14,6 @@ gem 'puppetlabs_spec_helper', '>=0.1.0', 	:require => false
 gem 'rspec-puppet-utils', '>=2.0.0', 		:require => false
 
 # acceptance testing
-gem	'beaker',		=2.32.1,				:require => false
+gem	'beaker',		'=2.32.1',				:require => false
 gem 'beaker-rspec', '>=5.2.0',  			:require => false
 gem 'serverspec', 							:require => false
